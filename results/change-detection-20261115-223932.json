@@ -1,0 +1,35 @@
+{
+  "command" : "./mvnw test -Peval -Dtest=ChangeEvalTest",
+  "commit" : "721d557",
+  "uncommitted_changes" : false,
+  "postings" : 108,
+  "detector" : "rules + RuleDiff, as in the worker",
+  "cases" : {
+    "wording_new_sentence" : {
+      "cases" : 108,
+      "correct" : 108,
+      "rate" : 1.0
+    },
+    "wording_benefit_line" : {
+      "cases" : 108,
+      "correct" : 108,
+      "rate" : 1.0
+    },
+    "wording_pay_change" : {
+      "cases" : 108,
+      "correct" : 108,
+      "rate" : 1.0
+    },
+    "sponsorship_withdrawn" : {
+      "cases" : 101,
+      "correct" : 101,
+      "rate" : 1.0
+    },
+    "graduation_year_moved" : {
+      "cases" : 31,
+      "correct" : 25,
+      "rate" : 0.806
+    }
+  },
+  "examples_wrong" : [ "graduation_year_moved greenhouse:affirm:8039471003", "graduation_year_moved greenhouse:duolingo:8881612002", "graduation_year_moved greenhouse:pinterest:7838591", "graduation_year_moved greenhouse:pinterest:8140217", "graduation_year_moved greenhouse:pinterest:8214788", "graduation_year_moved greenhouse:samsara:8358786" ]
+}
