@@ -43,6 +43,16 @@ services:
       SPRING_MAIN_WEB_APPLICATION_TYPE: none
       FINEPRINT_WORKER_ENABLED: "true"
       FINEPRINT_COLLECTOR_ENABLED: "true"
+      FINEPRINT_MAIL_PROVIDER: smtp
+      FINEPRINT_MAIL_SMTP_HOST: mailpit
+      FINEPRINT_MAIL_SMTP_PORT: "1025"
+    restart: unless-stopped
+
+  # local inbox for alert emails, nothing leaves the machine. web ui on localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.33.1
+    ports:
+      - "127.0.0.1:8025:8025"
     restart: unless-stopped
 
 volumes:

@@ -30,7 +30,7 @@ public class PollScheduler {
         this.jdbc = jdbc;
     }
 
-    @Scheduled(initialDelayString = "PT10S", fixedDelayString = "${fineprint.collector.poll-every}")
+    @Scheduled(initialDelayString = "${fineprint.collector.first-poll-after:PT10S}", fixedDelayString = "${fineprint.collector.poll-every}")
     public void tick() {
         for (String b : props.boards()) {
             String[] parts = b.split(":", 2);

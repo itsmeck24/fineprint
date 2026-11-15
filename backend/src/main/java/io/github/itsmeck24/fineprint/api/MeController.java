@@ -1,6 +1,7 @@
 package io.github.itsmeck24.fineprint.api;
 
 import java.time.YearMonth;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.itsmeck24.fineprint.store.NotificationStore;
 import io.github.itsmeck24.fineprint.store.UserStore;
 
 @RestController
@@ -27,9 +29,16 @@ public class MeController {
     }
 
     private final UserStore users;
+    private final NotificationStore notifications;
 
-    public MeController(UserStore users) {
+    public MeController(UserStore users, NotificationStore notifications) {
         this.users = users;
+        this.notifications = notifications;
+    }
+
+    @GetMapping("/notifications")
+    public List<NotificationStore.Row> notifications(@AuthenticationPrincipal Jwt jwt) {
+        return notifications.forUser(user(jwt).id(), 50);
     }
 
     @GetMapping("/health")

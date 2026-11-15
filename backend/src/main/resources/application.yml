@@ -17,6 +17,16 @@ fineprint:
     # local default only. compose and any real run set FINEPRINT_JWT_SECRET
     secret: "local-dev-secret-change-me-local-dev-secret"
     ttl: 7d
+  mail:
+    provider: log
+    from: "FinePrint <alerts@fineprint.localhost>"
+    smtp-host: localhost
+    smtp-port: 1025
+    resend-base: https://api.resend.com
+    resend-api-key: ""
+    lease: 2m
+    unknown-after: 23h
+    app-url: http://localhost:8081
   sources:
     greenhouse-base: https://boards-api.greenhouse.io/v1/boards/
     lever-base: https://api.lever.co/v0/postings/

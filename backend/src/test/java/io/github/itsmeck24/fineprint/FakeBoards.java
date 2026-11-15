@@ -19,6 +19,7 @@ public class FakeBoards {
     private final HttpServer server;
     private final Map<String, Reply> replies = new ConcurrentHashMap<>();
     private final Map<String, AtomicInteger> hits = new ConcurrentHashMap<>();
+    private volatile int maxDelayMs;
 
     public FakeBoards() {
         try {
@@ -31,13 +32,30 @@ public class FakeBoards {
                     + (ex.getRequestURI().getRawQuery() == null ? "" : "?" + ex.getRequestURI().getRawQuery());
             hits.computeIfAbsent(key, k -> new AtomicInteger()).incrementAndGet();
             Reply r = replies.getOrDefault(key, new Reply(404, "{}"));
+            sleepUpTo(maxDelayMs);
             byte[] body = r.body().getBytes(StandardCharsets.UTF_8);
             ex.getResponseHeaders().add("Content-Type", "application/json");
             ex.sendResponseHeaders(r.status(), body.length);
             ex.getResponseBody().write(body);
             ex.close();
         });
+        server.setExecutor(java.util.concurrent.Executors.newCachedThreadPool());
         server.start();
+    }
+
+    // real apis take a few hundred milliseconds, which is when a crash is most likely to land mid-request
+    public void maxDelay(int ms) {
+        this.maxDelayMs = ms;
+    }
+
+    static void sleepUpTo(int ms) {
+        if (ms > 0) {
+            try {
+                Thread.sleep(java.util.concurrent.ThreadLocalRandom.current().nextInt(ms + 1));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     public String base() {
