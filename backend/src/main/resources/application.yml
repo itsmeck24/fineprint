@@ -59,3 +59,17 @@ fineprint:
       - greenhouse:coinbase
       - lever:palantir
       - lever:zoox
+      # held-out companies for the evaluation test split, never used to write the rules
+      - greenhouse:waymo
+      - greenhouse:pinterest
+      - greenhouse:scaleai
+      - greenhouse:affirm
+      - greenhouse:datadog
+      - greenhouse:samsara
+      - greenhouse:duolingo
+      - greenhouse:nuro
+      - greenhouse:mongodb
+      - greenhouse:robinhood
+      - greenhouse:brex
+      - lever:matchgroup
+      - lever:veeva

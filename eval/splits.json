@@ -1,0 +1,9 @@
+{
+  "note": "split by company so the same posting template is never on both sides. dev boards were looked at while writing the rules. test boards were added afterwards and are only scored once labels are written.",
+  "dev": ["greenhouse:databricks", "greenhouse:roblox", "greenhouse:verkada", "greenhouse:twitch", "greenhouse:figma",
+          "greenhouse:lyft", "greenhouse:doordashusa", "greenhouse:cloudflare", "greenhouse:stripe", "greenhouse:coinbase",
+          "lever:palantir", "lever:zoox"],
+  "test": ["greenhouse:waymo", "greenhouse:pinterest", "greenhouse:scaleai", "greenhouse:affirm", "greenhouse:datadog",
+           "greenhouse:samsara", "greenhouse:duolingo", "greenhouse:nuro", "greenhouse:mongodb", "greenhouse:robinhood",
+           "greenhouse:brex", "lever:matchgroup", "lever:veeva"]
+}
