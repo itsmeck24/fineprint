@@ -25,15 +25,17 @@ public class ExtractJob implements JobHandler {
     private final CriteriaStore criteria;
     private final ChangeStore changesStore;
     private final Changes changes;
+    private final Digests digests;
     private final TransactionTemplate tx;
     private final JsonMapper json;
 
     public ExtractJob(PostingStore postings, CriteriaStore criteria, ChangeStore changesStore, Changes changes,
-                      TransactionTemplate tx, JsonMapper json) {
+                      Digests digests, TransactionTemplate tx, JsonMapper json) {
         this.postings = postings;
         this.criteria = criteria;
         this.changesStore = changesStore;
         this.changes = changes;
+        this.digests = digests;
         this.tx = tx;
         this.json = json;
     }
@@ -57,6 +59,10 @@ public class ExtractJob implements JobHandler {
             Optional<Long> next = changesStore.nextExtracted(v.postingId(), versionId);
             prev.ifPresent(p -> compare(v.postingId(), p, versionId));
             next.ifPresent(n -> compare(v.postingId(), versionId, n));
+            // the first version of a posting is when it counts as new for people watching its board
+            if (!changesStore.hasEarlierVersion(v.postingId(), versionId)) {
+                digests.offer(v.postingId(), v.title(), found);
+            }
         });
     }
 

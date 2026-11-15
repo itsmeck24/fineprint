@@ -12,6 +12,7 @@ public class Jobs {
     public static final String FETCH_POSTING = "fetch_posting";
     public static final String EXTRACT = "extract";
     public static final String CHECK_POSTING = "check_posting";
+    public static final String DIGESTS = "digests";
 
     private final JobQueue queue;
 
@@ -34,6 +35,10 @@ public class Jobs {
     // a follow-up check needs its own key, the current check is still running under the plain one
     public boolean checkPosting(long postingId, Duration delay, String dedupKey) {
         return queue.enqueue(CHECK_POSTING, "{\"postingId\":" + postingId + "}", dedupKey, delay);
+    }
+
+    public boolean digests() {
+        return queue.enqueue(DIGESTS, "{}", "digests");
     }
 
     public boolean extract(long versionId) {

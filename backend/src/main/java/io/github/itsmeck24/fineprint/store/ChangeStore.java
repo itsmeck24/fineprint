@@ -68,6 +68,11 @@ public class ChangeStore {
                 .params(postingId, from, to).query(Boolean.class).single();
     }
 
+    public boolean hasEarlierVersion(long postingId, long versionId) {
+        return jdbc.sql("select exists (select 1 from posting_versions where posting_id = ? and id < ?)")
+                .params(postingId, versionId).query(Boolean.class).single();
+    }
+
     public void lockPosting(long postingId) {
         jdbc.sql("select id from postings where id = ? for update").param(postingId).query(Long.class).single();
     }

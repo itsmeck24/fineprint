@@ -39,12 +39,14 @@ public class PollScheduler {
         int queued = 0;
         for (Long boardId : jdbc.sql("""
                         select id from boards where (ats || ':' || token) in (:configured)
+                           or id in (select board_id from watches)
                            or id in (select p.board_id from saved_postings s join postings p on p.id = s.posting_id)""")
                 .param("configured", props.boards()).query(Long.class).list()) {
             if (jobs.pollBoard(boardId)) {
                 queued++;
             }
         }
+        jobs.digests();
         log.info("queued {} board polls", queued);
     }
 }
