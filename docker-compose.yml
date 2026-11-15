@@ -1,3 +1,9 @@
+x-app-env: &app-env
+  SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/fineprint
+  SPRING_DATASOURCE_USERNAME: fineprint
+  SPRING_DATASOURCE_PASSWORD: fineprint
+  FINEPRINT_JWT_SECRET: ${FINEPRINT_JWT_SECRET:-local-compose-secret-change-me-0123456789}
+
 services:
   db:
     image: postgres:16
@@ -15,15 +21,28 @@ services:
       timeout: 3s
       retries: 10
 
-  collector:
+  api:
     build: ./backend
     depends_on:
       db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/fineprint
-      SPRING_DATASOURCE_USERNAME: fineprint
-      SPRING_DATASOURCE_PASSWORD: fineprint
+      <<: *app-env
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+
+  # the worker runs the queue and the hourly poll, with no web server
+  worker:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *app-env
+      SPRING_MAIN_WEB_APPLICATION_TYPE: none
+      FINEPRINT_WORKER_ENABLED: "true"
+      FINEPRINT_COLLECTOR_ENABLED: "true"
     restart: unless-stopped
 
 volumes:

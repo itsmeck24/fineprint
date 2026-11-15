@@ -1,0 +1,64 @@
+package io.github.itsmeck24.fineprint.api;
+
+import java.time.YearMonth;
+import java.util.Map;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import io.github.itsmeck24.fineprint.store.UserStore;
+
+@RestController
+@ConditionalOnWebApplication
+@RequestMapping("/api")
+public class MeController {
+
+    public record Profile(String gradMonth, String degreeLevel) {
+    }
+
+    private final UserStore users;
+
+    public MeController(UserStore users) {
+        this.users = users;
+    }
+
+    @GetMapping("/health")
+    public Map<String, String> health() {
+        return Map.of("status", "ok");
+    }
+
+    @GetMapping("/me")
+    public Map<String, String> me(@AuthenticationPrincipal Jwt jwt) {
+        UserStore.User u = user(jwt);
+        return Map.of("email", u.email(), "gradMonth", u.gradMonth().toString(), "degreeLevel", u.degreeLevel());
+    }
+
+    @PutMapping("/me")
+    public Map<String, String> update(@AuthenticationPrincipal Jwt jwt, @RequestBody Profile p) {
+        UserStore.User u = user(jwt);
+        YearMonth grad = AuthController.parseMonth(p.gradMonth());
+        users.updateProfile(u.id(), grad, AuthController.parseDegree(p.degreeLevel()));
+        return me(jwt);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal Jwt jwt) {
+        users.delete(user(jwt).id());
+        return ResponseEntity.noContent().build();
+    }
+
+    private UserStore.User user(Jwt jwt) {
+        return users.byId(Long.parseLong(jwt.getSubject()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+    }
+}

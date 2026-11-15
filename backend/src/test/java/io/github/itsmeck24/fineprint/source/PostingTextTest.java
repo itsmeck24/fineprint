@@ -1,4 +1,4 @@
-package io.github.itsmeck24.fineprint;
+package io.github.itsmeck24.fineprint.source;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

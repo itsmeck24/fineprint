@@ -1,16 +1,32 @@
 spring:
   application:
     name: fineprint
-  main:
-    keep-alive: true
   datasource:
     url: jdbc:postgresql://localhost:5434/fineprint
     username: fineprint
     password: fineprint
 
+server:
+  port: 8080
+
 fineprint:
+  cors-origins:
+    - http://localhost:5173
+    - http://localhost:8081
+  jwt:
+    # local default only. compose and any real run set FINEPRINT_JWT_SECRET
+    secret: "local-dev-secret-change-me-local-dev-secret"
+    ttl: 7d
+  sources:
+    greenhouse-base: https://boards-api.greenhouse.io/v1/boards/
+    lever-base: https://api.lever.co/v0/postings/
+  worker:
+    enabled: false
+    threads: 2
+    lease: 5m
+    idle-sleep: 500ms
   collector:
-    enabled: true
+    enabled: false
     user-agent: "fineprint-collector/0.1 (student project; low rate)"
     min-gap: 2s
     poll-every: PT1H

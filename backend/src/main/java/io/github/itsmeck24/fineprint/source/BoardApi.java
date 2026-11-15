@@ -1,4 +1,4 @@
-package io.github.itsmeck24.fineprint;
+package io.github.itsmeck24.fineprint.source;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+
+import io.github.itsmeck24.fineprint.FinePrintProperties;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -28,25 +30,26 @@ public class BoardApi {
     public static class FetchFailed extends IOException {
         public final int status;
 
-        FetchFailed(String url, int status) {
+        public FetchFailed(String url, int status) {
             super("HTTP " + status + " for " + url);
             this.status = status;
         }
     }
 
-    static final String GREENHOUSE = "https://boards-api.greenhouse.io/v1/boards/";
-    static final String LEVER = "https://api.lever.co/v0/postings/";
-
     private final HttpFetcher http;
     private final JsonMapper json;
+    private final String greenhouse;
+    private final String lever;
 
-    public BoardApi(HttpFetcher http, JsonMapper json) {
+    public BoardApi(HttpFetcher http, JsonMapper json, FinePrintProperties props) {
         this.http = http;
         this.json = json;
+        this.greenhouse = props == null ? "" : props.sources().greenhouseBase();
+        this.lever = props == null ? "" : props.sources().leverBase();
     }
 
     public List<ListItem> greenhouseList(String token) throws IOException, InterruptedException {
-        JsonNode root = getJson(GREENHOUSE + token + "/jobs");
+        JsonNode root = getJson(greenhouse + token + "/jobs");
         List<ListItem> out = new ArrayList<>();
         for (JsonNode j : root.path("jobs")) {
             out.add(new ListItem(j.path("id").asString(), str(j, "internal_job_id"), j.path("title").asString(),
@@ -56,16 +59,20 @@ public class BoardApi {
     }
 
     public Snapshot greenhouseDetail(String token, String id) throws IOException, InterruptedException {
-        return parseGreenhouseDetail(getJson(GREENHOUSE + token + "/jobs/" + id + "?questions=true"));
+        return parseGreenhouseDetail(getJson(greenhouse + token + "/jobs/" + id + "?questions=true"));
     }
 
     public List<Snapshot> leverList(String site) throws IOException, InterruptedException {
-        JsonNode root = getJson(LEVER + site + "?mode=json");
+        JsonNode root = getJson(lever + site + "?mode=json");
         List<Snapshot> out = new ArrayList<>();
         for (JsonNode p : root) {
             out.add(parseLeverPosting(p));
         }
         return out;
+    }
+
+    public Snapshot leverPosting(String site, String id) throws IOException, InterruptedException {
+        return parseLeverPosting(getJson(lever + site + "/" + id));
     }
 
     Snapshot parseGreenhouseDetail(JsonNode d) {

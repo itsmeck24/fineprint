@@ -1,4 +1,4 @@
-package io.github.itsmeck24.fineprint;
+package io.github.itsmeck24.fineprint.source;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +12,7 @@ import tools.jackson.databind.json.JsonMapper;
 class BoardApiParseTest {
 
     private final JsonMapper json = JsonMapper.builder().build();
-    private final BoardApi api = new BoardApi(null, json);
+    private final BoardApi api = new BoardApi(null, json, null);
 
     @Test
     void greenhouseDetailWithForm() {
