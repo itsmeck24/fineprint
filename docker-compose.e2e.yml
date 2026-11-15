@@ -1,0 +1,16 @@
+# e2e stack: the worker reads a fake job board, so tests never call real sites.
+#   docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d --build
+services:
+  fakeboard:
+    image: nginx:1.29-alpine
+    volumes:
+      - ./web/e2e/fakeboard:/srv:ro
+      - ./web/e2e/fakeboard/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  worker:
+    environment:
+      FINEPRINT_COLLECTOR_ENABLED: "false"
+      FINEPRINT_SOURCES_GREENHOUSE_BASE: http://fakeboard/v1/boards/
+      FINEPRINT_COLLECTOR_MIN_GAP: 0s
+      FINEPRINT_WORKER_IDLE_SLEEP: 100ms
+    depends_on:
+      - fakeboard

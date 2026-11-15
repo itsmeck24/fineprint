@@ -12,7 +12,7 @@ services:
       POSTGRES_USER: fineprint
       POSTGRES_PASSWORD: fineprint
     ports:
-      - "127.0.0.1:5434:5432"
+      - "127.0.0.1:${FINEPRINT_DB_PORT:-5434}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -29,7 +29,7 @@ services:
     environment:
       <<: *app-env
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:${FINEPRINT_API_PORT:-8080}:8080"
     restart: unless-stopped
 
   # the worker runs the queue and the hourly poll, with no web server
@@ -48,11 +48,20 @@ services:
       FINEPRINT_MAIL_SMTP_PORT: "1025"
     restart: unless-stopped
 
+  # the react app, served by nginx, with /api passed to the api service
+  web:
+    build: ./web
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:${FINEPRINT_WEB_PORT:-8081}:80"
+    restart: unless-stopped
+
   # local inbox for alert emails, nothing leaves the machine. web ui on localhost:8025
   mailpit:
     image: axllent/mailpit:v1.33.1
     ports:
-      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:${FINEPRINT_MAIL_PORT:-8025}:8025"
     restart: unless-stopped
 
 volumes:

@@ -1,0 +1,9 @@
+{"id": 101, "internal_job_id": 9101, "title": "Software Engineer Intern (Summer 2027)",
+ "absolute_url": "https://job-boards.greenhouse.io/demo/jobs/101", "location": {"name": "Remote"},
+ "first_published": "2026-10-01T09:00:00-04:00", "updated_at": "2026-11-01T09:00:00-04:00",
+ "content": "&lt;p&gt;About the team.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Pursuing a Bachelor's or Master's degree and graduating between Fall 2027 and Summer 2028.&lt;/li&gt;&lt;li&gt;We are unable to sponsor visas for this role.&lt;/li&gt;&lt;/ul&gt;",
+ "questions": [
+  {"label": "When do you expect to graduate?", "required": true,
+   "fields": [{"name": "q1", "values": [{"label": "Sept - Dec 2027"}, {"label": "Jan - April 2028"}, {"label": "Other"}]}]},
+  {"label": "Will you now or in the future require sponsorship?", "required": true,
+   "fields": [{"name": "q2", "values": [{"label": "Yes"}, {"label": "No"}]}]}]}

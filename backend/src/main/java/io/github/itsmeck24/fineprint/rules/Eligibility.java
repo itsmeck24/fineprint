@@ -30,7 +30,7 @@ public final class Eligibility {
     // strongest stance first. work authorization is shown as what the posting says, not matched to the user,
     // because the app does not store anyone's visa status.
     static final List<String> AUTH_ORDER = List.of("citizenship_required", "clearance_required", "no_sponsorship",
-            "hedged", "sponsors", "export_control");
+            "hedged", "sponsors", "authorization_required", "export_control");
 
     public static List<Rule> card(Profile p, String title, List<Criterion> criteria) {
         return List.of(grad(p, criteria), degree(p, criteria), returnToSchool(p, title, criteria), auth(criteria));
@@ -121,6 +121,10 @@ public final class Eligibility {
         boolean no = false;
         for (Criterion c : rules) {
             reasons.add(new Reason(c.source(), c.quote(), c.value()));
+            // a value missing from the list ranks last, never first
+            if (!AUTH_ORDER.contains(c.value())) {
+                continue;
+            }
             if (best == null || AUTH_ORDER.indexOf(c.value()) < AUTH_ORDER.indexOf(best)) {
                 best = c.value();
             }

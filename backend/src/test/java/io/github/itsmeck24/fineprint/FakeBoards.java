@@ -20,6 +20,7 @@ public class FakeBoards {
     private final Map<String, Reply> replies = new ConcurrentHashMap<>();
     private final Map<String, AtomicInteger> hits = new ConcurrentHashMap<>();
     private volatile int maxDelayMs;
+    private volatile int fixedDelayMs;
 
     public FakeBoards() {
         try {
@@ -32,7 +33,11 @@ public class FakeBoards {
                     + (ex.getRequestURI().getRawQuery() == null ? "" : "?" + ex.getRequestURI().getRawQuery());
             hits.computeIfAbsent(key, k -> new AtomicInteger()).incrementAndGet();
             Reply r = replies.getOrDefault(key, new Reply(404, "{}"));
-            sleepUpTo(maxDelayMs);
+            if (fixedDelayMs > 0) {
+                sleepUpTo(-fixedDelayMs);
+            } else {
+                sleepUpTo(maxDelayMs);
+            }
             byte[] body = r.body().getBytes(StandardCharsets.UTF_8);
             ex.getResponseHeaders().add("Content-Type", "application/json");
             ex.sendResponseHeaders(r.status(), body.length);
@@ -48,7 +53,21 @@ public class FakeBoards {
         this.maxDelayMs = ms;
     }
 
+    // every request takes exactly this long, for benchmarks
+    public void fixedDelay(int ms) {
+        this.fixedDelayMs = ms;
+    }
+
+    // positive: random up to ms. negative: exactly -ms
     static void sleepUpTo(int ms) {
+        if (ms < 0) {
+            try {
+                Thread.sleep(-ms);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return;
+        }
         if (ms > 0) {
             try {
                 Thread.sleep(java.util.concurrent.ThreadLocalRandom.current().nextInt(ms + 1));

@@ -6,3 +6,5 @@ target/
 .env
 # posting text exported from the local database for labeling. not redistributed.
 eval/data/
+__pycache__/
+*.tsbuildinfo
