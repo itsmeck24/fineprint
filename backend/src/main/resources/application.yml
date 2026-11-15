@@ -31,6 +31,8 @@ fineprint:
     min-gap: 2s
     poll-every: PT1H
     detail-refresh: 24h
+    # a posting is closed only after two 404s at least this far apart, while missing from the board list
+    close-after: 1h
     # early-career titles only, so the collector stays small
     title-include: "(?i)\\b(new grad(uate)?s?|university grad(uate)?s?|early career|recent grad(uate)?s?|intern(ship)?s?|co-?op|graduate|class of 20\\d\\d)\\b|\\b20(27|28|29)\\b"
     title-exclude: "(?i)\\b(senior|sr|staff|principal|manager|director|lead|head)\\b"

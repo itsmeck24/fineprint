@@ -25,6 +25,9 @@ public class PostingStore {
     public record PostingRef(long id, long boardId, String ats, String token, String externalId) {
     }
 
+    public record Status(String status, int missCount, Instant firstMissAt, Instant closedAt, Instant lastSeenAt) {
+    }
+
     public record Version(long id, long postingId, Instant fetchedAt, String title, String location, String bodyText,
                           String form) {
     }
@@ -90,7 +93,12 @@ public class PostingStore {
                             title = excluded.title,
                             url = coalesce(excluded.url, postings.url),
                             source_updated_at = coalesce(excluded.source_updated_at, postings.source_updated_at),
-                            last_seen_at = now()
+                            last_seen_at = now(),
+                            -- listed again, so earlier misses and fetch errors no longer count. closed stays closed
+                            -- until a check confirms the posting is back
+                            miss_count = 0,
+                            first_miss_at = null,
+                            status = case when postings.status = 'unreachable' then 'open' else postings.status end
                         returning id""")
                 .params(boardId, externalId, internalJobId, title, url, ts(sourceUpdatedAt))
                 .query(Long.class).single();
@@ -103,6 +111,61 @@ public class PostingStore {
                         on conflict (board_id, external_id) do nothing""")
                 .params(boardId, externalId).update();
         return find(boardId, externalId).orElseThrow().id();
+    }
+
+    public java.util.Set<String> trackedExternalIds(long boardId) {
+        return new java.util.HashSet<>(jdbc.sql("select external_id from postings where board_id = ?").param(boardId)
+                .query(String.class).list());
+    }
+
+    public Instant dbNow() {
+        return jdbc.sql("select now()").query(Timestamp.class).single().toInstant();
+    }
+
+    // tracked postings of a board that the latest listing did not include
+    public List<Long> missingFromListing(long boardId, Instant listedAt) {
+        return jdbc.sql("select id from postings where board_id = ? and last_seen_at < ? and status <> 'closed'")
+                .params(boardId, ts(listedAt)).query(Long.class).list();
+    }
+
+    public List<Long> closedButListed(long boardId, Instant listedAt) {
+        return jdbc.sql("select id from postings where board_id = ? and last_seen_at >= ? and status = 'closed'")
+                .params(boardId, ts(listedAt)).query(Long.class).list();
+    }
+
+    public Status status(long postingId) {
+        return jdbc.sql("""
+                        select status, miss_count, first_miss_at, closed_at, last_seen_at
+                        from postings where id = ? for update""")
+                .param(postingId)
+                .query((rs, n) -> new Status(rs.getString(1), rs.getInt(2), instant(rs.getTimestamp(3)),
+                        instant(rs.getTimestamp(4)), instant(rs.getTimestamp(5))))
+                .single();
+    }
+
+    public Status recordMiss(long postingId) {
+        jdbc.sql("update postings set miss_count = miss_count + 1, first_miss_at = coalesce(first_miss_at, now()) where id = ?")
+                .param(postingId).update();
+        return status(postingId);
+    }
+
+    public void markClosed(long postingId) {
+        jdbc.sql("update postings set status = 'closed', closed_at = now() where id = ?").param(postingId).update();
+    }
+
+    public void markOpen(long postingId) {
+        jdbc.sql("update postings set status = 'open', miss_count = 0, first_miss_at = null, closed_at = null where id = ?")
+                .param(postingId).update();
+    }
+
+    // a failed fetch never closes a posting
+    public void markUnreachable(long postingId) {
+        jdbc.sql("update postings set status = 'unreachable' where id = ? and status = 'open'").param(postingId).update();
+    }
+
+    public Optional<Instant> lastPoll(long boardId) {
+        return jdbc.sql("select polled_at from board_polls where board_id = ? order by id desc limit 1").param(boardId)
+                .query(Timestamp.class).optional().map(Timestamp::toInstant);
     }
 
     public boolean savedByAnyone(long boardId, String externalId) {
