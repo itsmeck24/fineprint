@@ -170,15 +170,17 @@ class CrashHarnessTest extends DbTest {
             Thread.sleep(100);
         }
 
-        // no more kills: let everything finish
-        Instant settleUntil = Instant.now().plus(Duration.ofMinutes(3));
+        // no more kills: let everything finish, including jobs waiting out a retry backoff
+        Instant settleUntil = Instant.now().plus(Duration.ofMinutes(Integer.getInteger("crash.settle-minutes", 10)));
         int finalGeneration = generation;
+        Instant settleStarted = Instant.now();
         while (Instant.now().isBefore(settleUntil)) {
             boolean versionsDone = count("select count(*) from posting_versions where posting_id = any(?) and extracted_at is not null",
                     (Object) postingIds.toArray(new Long[0])) >= POSTINGS * (finalGeneration + 1);
             boolean eventsDone = events() >= POSTINGS * finalGeneration;
             boolean mailDone = count("select count(*) from notifications where status in ('pending', 'sending')") == 0;
-            if (versionsDone && eventsDone && mailDone) {
+            boolean jobsDone = count("select count(*) from jobs where status in ('ready', 'running') and type <> 'poll_board'") == 0;
+            if (versionsDone && eventsDone && mailDone || jobsDone && mailDone && Instant.now().isAfter(settleStarted.plusSeconds(30))) {
                 break;
             }
             Thread.sleep(200);
@@ -252,6 +254,24 @@ class CrashHarnessTest extends DbTest {
         r.put("duplicate_deliveries", duplicateDeliveries);
         r.put("sent_but_not_delivered", sentNotDelivered);
         r.put("jobs_retried_after_lease_or_error", jobsRetried);
+        r.put("settle_seconds", Duration.between(settleStarted, Instant.now()).toSeconds());
+        // where any shortfall comes from: work still queued, a version never fetched, or a version without its event
+        ObjectNode diag = r.putObject("diagnostics");
+        diag.set("pending_jobs", json.valueToTree(jdbc.sql("""
+                select type || ':' || status || ':attempts=' || attempts as k from jobs
+                where status in ('ready', 'running') and type <> 'poll_board'""").query(String.class).list()));
+        diag.put("postings_missing_versions", count("""
+                select count(*) from (select p.id from postings p left join posting_versions v on v.posting_id = p.id
+                where p.id = any(?) group by p.id having count(v.id) < ?) x""", ids, finalGeneration + 1));
+        diag.put("versions_not_extracted", count("""
+                select count(*) from posting_versions where posting_id = any(?) and extracted_at is null""", (Object) ids));
+        diag.put("adjacent_version_pairs_without_event", count("""
+                select count(*) from posting_versions v
+                join lateral (select id from posting_versions n where n.posting_id = v.posting_id and n.id > v.id
+                              order by n.id limit 1) nxt on true
+                where v.posting_id = any(?)
+                  and not exists (select 1 from change_events e where e.from_version_id = v.id and e.to_version_id = nxt.id)""",
+                (Object) ids));
         r.put("dead_jobs", deadJobs);
 
         Path out = Path.of("..", "results");
