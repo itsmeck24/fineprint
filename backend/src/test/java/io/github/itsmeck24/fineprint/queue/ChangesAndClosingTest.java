@@ -199,6 +199,31 @@ class ChangesAndClosingTest extends DbTest {
                 .isZero();
     }
 
+    // found by the 500-kill run: the list says a posting changed, but the fetch that ran got the old content
+    // (it was already running when the change appeared). the next poll must still fetch it again.
+    @Test
+    void aChangeSeenOnlyInTheListingIsFetchedLater() throws Exception {
+        long board = store.boardId("greenhouse", "stale");
+        String gen1 = "{\"jobs\":[{\"id\":600,\"title\":\"Software Engineer Intern\",\"updated_at\":\"2026-11-01T09:00:00-04:00\"}]}";
+        String gen2 = gen1.replace("2026-11-01T09:00:00", "2026-11-02T09:00:00");
+        boards.put("/v1/boards/stale/jobs", 200, gen1);
+        boards.put("/v1/boards/stale/jobs/600?questions=true", 200, detail(600, "<p>You will graduate in fall 2027 or spring 2028.</p>"));
+        jobs.pollBoard(board);
+        drain();
+        long posting = store.find(board, "600").orElseThrow().id();
+
+        // the listing moves on, the detail answer is still the old one
+        boards.put("/v1/boards/stale/jobs", 200, gen2);
+        jobs.pollBoard(board);
+        drain();
+        // now the detail catches up
+        boards.put("/v1/boards/stale/jobs/600?questions=true", 200, FakeBoards.greenhouseDetail(600, "Software Engineer Intern",
+                "<p>You will graduate in spring 2028 or summer 2028.</p>", "[]").replace("2026-11-01T09:00:00", "2026-11-02T09:00:00"));
+        jobs.pollBoard(board);
+        drain();
+        assertThat(kinds(posting)).containsExactly("rules_changed");
+    }
+
     @Test
     void twoWritersSavingTheSameNewContentStoreOneVersion() throws Exception {
         long board = store.boardId("greenhouse", "race");

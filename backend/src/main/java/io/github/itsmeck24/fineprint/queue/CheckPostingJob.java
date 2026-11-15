@@ -76,7 +76,7 @@ public class CheckPostingJob implements JobHandler {
             store.markOpen(postingId);
             String form = s.form() == null ? null : json.writeValueAsString(s.form());
             store.saveVersionIfChanged(postingId, s, form, json.writeValueAsString(s.raw()));
-            store.markDetail(postingId);
+            store.markDetail(postingId, s.updatedAt());
         });
     }
 

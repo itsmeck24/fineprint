@@ -83,7 +83,7 @@ public class PollBoardJob implements JobHandler {
             kept++;
             Optional<PostingStore.Existing> before = store.find(board.id(), item.externalId());
             long postingId = store.upsertPosting(board.id(), item.externalId(), item.internalJobId(), item.title(),
-                    item.url(), item.updatedAt());
+                    item.url());
             boolean needDetail = before.isEmpty()
                     || !Objects.equals(before.get().sourceUpdatedAt(), item.updatedAt())
                     || before.get().lastDetailAt() == null
@@ -105,11 +105,11 @@ public class PollBoardJob implements JobHandler {
                 continue;
             }
             kept++;
-            long postingId = store.upsertPosting(board.id(), p.externalId(), null, p.title(), p.url(), null);
+            long postingId = store.upsertPosting(board.id(), p.externalId(), null, p.title(), p.url());
             if (store.saveVersionIfChanged(postingId, p, null, json.writeValueAsString(p.raw())).isPresent()) {
                 changed++;
             }
-            store.markDetail(postingId);
+            store.markDetail(postingId, null);
         }
         return new int[] {postings.size(), kept, changed};
     }

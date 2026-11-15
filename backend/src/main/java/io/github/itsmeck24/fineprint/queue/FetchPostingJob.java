@@ -51,6 +51,6 @@ public class FetchPostingJob implements JobHandler {
         }
         String form = s.form() == null ? null : json.writeValueAsString(s.form());
         store.saveVersionIfChanged(postingId, s, form, json.writeValueAsString(s.raw()));
-        store.markDetail(postingId);
+        store.markDetail(postingId, s.updatedAt());
     }
 }

@@ -44,7 +44,7 @@ class PostingStoreTest extends DbTest {
     @Test
     void sameContentTwiceStoresOneVersion() {
         long board = store.boardId("greenhouse", "store-a");
-        long posting = store.upsertPosting(board, "1", null, "SWE Intern", null, null);
+        long posting = store.upsertPosting(board, "1", null, "SWE Intern", null);
 
         assertThat(store.saveVersionIfChanged(posting, snap("1", "body A"), null, "{}")).isPresent();
         assertThat(store.saveVersionIfChanged(posting, snap("1", "body A"), null, "{}")).isEmpty();
@@ -54,7 +54,7 @@ class PostingStoreTest extends DbTest {
     @Test
     void changingBackToOldContentIsStillAVersion() {
         long board = store.boardId("greenhouse", "store-b");
-        long posting = store.upsertPosting(board, "1", null, "SWE Intern", null, null);
+        long posting = store.upsertPosting(board, "1", null, "SWE Intern", null);
 
         store.saveVersionIfChanged(posting, snap("1", "body A"), null, "{}");
         store.saveVersionIfChanged(posting, snap("1", "body B"), null, "{}");
@@ -65,7 +65,7 @@ class PostingStoreTest extends DbTest {
     @Test
     void everyNewVersionGetsExactlyOneExtractJob() {
         long board = store.boardId("greenhouse", "store-c");
-        long posting = store.upsertPosting(board, "1", null, "SWE Intern", null, null);
+        long posting = store.upsertPosting(board, "1", null, "SWE Intern", null);
         long v = store.saveVersionIfChanged(posting, snap("1", "body A"), null, "{}").orElseThrow();
         store.saveVersionIfChanged(posting, snap("1", "body A"), null, "{}");
         assertThat(extractJobs(v)).isEqualTo(1);
@@ -76,8 +76,8 @@ class PostingStoreTest extends DbTest {
         long board = store.boardId("lever", "store-d");
         assertThat(store.boardId("lever", "store-d")).isEqualTo(board);
 
-        long first = store.upsertPosting(board, "x", null, "Old title", null, null);
-        long second = store.upsertPosting(board, "x", null, "New title", null, null);
+        long first = store.upsertPosting(board, "x", null, "Old title", null);
+        long second = store.upsertPosting(board, "x", null, "New title", null);
         assertThat(second).isEqualTo(first);
 
         store.saveVersionIfChanged(first, snap("x", "v1"), null, "{}");
@@ -92,7 +92,7 @@ class PostingStoreTest extends DbTest {
     @Test
     void ensurePostingDoesNotTouchAnExistingRow() {
         long board = store.boardId("greenhouse", "store-e");
-        long id = store.upsertPosting(board, "9", null, "Real title", null, null);
+        long id = store.upsertPosting(board, "9", null, "Real title", null);
         assertThat(store.ensurePosting(board, "9")).isEqualTo(id);
         assertThat(jdbc.sql("select title from postings where id = ?").param(id).query(String.class).single())
                 .isEqualTo("Real title");

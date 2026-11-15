@@ -82,17 +82,17 @@ public class PostingStore {
                 .list();
     }
 
-    // seen in a board listing: updates the row and marks it seen now
-    public long upsertPosting(long boardId, String externalId, String internalJobId, String title, String url,
-                              Instant sourceUpdatedAt) {
+    // seen in a board listing: updates the row and marks it seen now. the listing's updated_at is not stored here:
+    // only a detail fetch records it, together with the content it got, so a change seen in the listing while a
+    // fetch was already running is fetched again on the next poll
+    public long upsertPosting(long boardId, String externalId, String internalJobId, String title, String url) {
         return jdbc.sql("""
-                        insert into postings (board_id, external_id, internal_job_id, title, url, source_updated_at)
-                        values (?, ?, ?, ?, ?, ?)
+                        insert into postings (board_id, external_id, internal_job_id, title, url)
+                        values (?, ?, ?, ?, ?)
                         on conflict (board_id, external_id) do update set
                             internal_job_id = coalesce(excluded.internal_job_id, postings.internal_job_id),
                             title = excluded.title,
                             url = coalesce(excluded.url, postings.url),
-                            source_updated_at = coalesce(excluded.source_updated_at, postings.source_updated_at),
                             last_seen_at = now(),
                             -- listed again, so earlier misses and fetch errors no longer count. closed stays closed
                             -- until a check confirms the posting is back
@@ -100,7 +100,7 @@ public class PostingStore {
                             first_miss_at = null,
                             status = case when postings.status = 'unreachable' then 'open' else postings.status end
                         returning id""")
-                .params(boardId, externalId, internalJobId, title, url, ts(sourceUpdatedAt))
+                .params(boardId, externalId, internalJobId, title, url)
                 .query(Long.class).single();
     }
 
@@ -223,8 +223,12 @@ public class PostingStore {
                 .query(Long.class).optional();
     }
 
-    public void markDetail(long postingId) {
-        jdbc.sql("update postings set last_detail_at = now() where id = ?").param(postingId).update();
+    // sourceUpdatedAt is the updated_at of the content that was just fetched, null when the board has none
+    public void markDetail(long postingId, Instant sourceUpdatedAt) {
+        jdbc.sql("""
+                        update postings set last_detail_at = now(),
+                            source_updated_at = coalesce(?, source_updated_at) where id = ?""")
+                .params(ts(sourceUpdatedAt), postingId).update();
     }
 
     public void recordPoll(long boardId, int jobCount, int keptCount) {
