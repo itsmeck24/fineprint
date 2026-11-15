@@ -70,7 +70,8 @@ class CrashHarnessTest extends DbTest {
             long id = 5000 + i;
             list.append(i == 0 ? "" : ",").append("{\"id\":").append(id)
                     .append(",\"title\":\"Software Engineer Intern\",\"updated_at\":\"").append(updated).append("\"}");
-            String sentence = "You will graduate in " + SEASONS[generation % 4] + " " + (2027 + generation / 4) + ".";
+            // the year wraps within 2027 to 2076, the date rules only read years 2000 to 2099
+            String sentence = "You will graduate in " + SEASONS[generation % 4] + " " + (2027 + (generation / 4) % 50) + ".";
             boards.put("/v1/boards/crash/jobs/" + id + "?questions=true", 200,
                     FakeBoards.greenhouseDetail(id, "Software Engineer Intern", "<p>" + sentence + "</p>", "[]")
                             .replace("2026-11-01T09:00:00-04:00", updated));
