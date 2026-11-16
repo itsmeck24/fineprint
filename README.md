@@ -1,5 +1,7 @@
 # FinePrint
 
+[![tests](https://github.com/itsmeck24/fineprint/actions/workflows/ci.yml/badge.svg)](https://github.com/itsmeck24/fineprint/actions/workflows/ci.yml)
+
 FinePrint reads a job posting's title, description and application form and checks four eligibility rules against
 a student's graduation month and degree: the graduation window, the degree level, whether they must return to
 school after an internship, and what the posting says about visa sponsorship. Every answer quotes the sentence or
@@ -8,6 +10,8 @@ one email.
 
 - Project page with a live demo: https://itsmeck24.github.io/fineprint/
 - The app: https://fineprint-app.onrender.com (free server, the first visit takes about a minute to wake it)
+
+[![FinePrint project page](docs/screenshot.png)](https://itsmeck24.github.io/fineprint/)
 
 ## What it does
 
