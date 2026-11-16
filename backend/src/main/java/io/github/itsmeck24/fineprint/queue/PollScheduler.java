@@ -1,5 +1,7 @@
 package io.github.itsmeck24.fineprint.queue;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,7 +12,8 @@ import org.springframework.stereotype.Component;
 import io.github.itsmeck24.fineprint.FinePrintProperties;
 import io.github.itsmeck24.fineprint.store.PostingStore;
 
-// once an hour, queue a poll for every configured board and every board a saved posting belongs to.
+// once an hour, queue a poll for every configured board (unless turned off), every watched board,
+// and every board a saved posting belongs to.
 // the dedup key means a slow poll is never queued twice.
 @Component
 @ConditionalOnProperty(name = "fineprint.collector.enabled", havingValue = "true")
@@ -32,7 +35,8 @@ public class PollScheduler {
 
     @Scheduled(initialDelayString = "${fineprint.collector.first-poll-after:PT10S}", fixedDelayString = "${fineprint.collector.poll-every}")
     public void tick() {
-        for (String b : props.boards()) {
+        List<String> configured = props.pollConfiguredBoards() ? props.boards() : List.of();
+        for (String b : configured) {
             String[] parts = b.split(":", 2);
             store.boardId(parts[0], parts[1]);
         }
@@ -41,7 +45,7 @@ public class PollScheduler {
                         select id from boards where (ats || ':' || token) in (:configured)
                            or id in (select board_id from watches)
                            or id in (select p.board_id from saved_postings s join postings p on p.id = s.posting_id)""")
-                .param("configured", props.boards()).query(Long.class).list()) {
+                .param("configured", configured.isEmpty() ? List.of("") : configured).query(Long.class).list()) {
             if (jobs.pollBoard(boardId)) {
                 queued++;
             }

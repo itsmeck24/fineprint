@@ -115,7 +115,7 @@ The project page in `docs/` is a static build served by GitHub Pages.
 
 ## Tests
 
-- `cd backend && ./mvnw verify`: 86 tests. Database tests run against real Postgres through Testcontainers. Job board
+- `cd backend && ./mvnw verify`: 88 tests. Database tests run against real Postgres through Testcontainers. Job board
   and email provider calls go to local fake servers.
 - End to end, against the full stack with a fake job board:
   ```

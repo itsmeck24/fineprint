@@ -21,11 +21,19 @@ public class Jobs {
     }
 
     public boolean pollBoard(long boardId) {
-        return queue.enqueue(POLL_BOARD, "{\"boardId\":" + boardId + "}", "poll:" + boardId);
+        return pollBoard(boardId, JobQueue.BACKGROUND);
+    }
+
+    public boolean pollBoard(long boardId, int priority) {
+        return queue.enqueue(POLL_BOARD, "{\"boardId\":" + boardId + "}", "poll:" + boardId, Duration.ZERO, priority);
     }
 
     public boolean fetchPosting(long postingId) {
-        return queue.enqueue(FETCH_POSTING, "{\"postingId\":" + postingId + "}", "fetch:" + postingId);
+        return fetchPosting(postingId, JobQueue.BACKGROUND);
+    }
+
+    public boolean fetchPosting(long postingId, int priority) {
+        return queue.enqueue(FETCH_POSTING, "{\"postingId\":" + postingId + "}", "fetch:" + postingId, Duration.ZERO, priority);
     }
 
     public boolean checkPosting(long postingId) {
@@ -42,6 +50,7 @@ public class Jobs {
     }
 
     public boolean extract(long versionId) {
-        return queue.enqueue(EXTRACT, "{\"versionId\":" + versionId + "}", "extract:" + versionId);
+        return queue.enqueue(EXTRACT, "{\"versionId\":" + versionId + "}", "extract:" + versionId, Duration.ZERO,
+                JobQueue.NO_NETWORK);
     }
 }

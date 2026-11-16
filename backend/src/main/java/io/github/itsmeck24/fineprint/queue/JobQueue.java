@@ -25,16 +25,31 @@ public class JobQueue {
     }
 
     public boolean enqueue(String type, String payloadJson, String dedupKey, Duration delay) {
+        return enqueue(type, payloadJson, dedupKey, delay, BACKGROUND);
+    }
+
+    public static final int BACKGROUND = 0;
+    public static final int NO_NETWORK = 1;
+    public static final int USER_WAITING = 2;
+
+    public boolean enqueue(String type, String payloadJson, String dedupKey, Duration delay, int priority) {
         int n = jdbc.sql("""
-                        insert into jobs (type, payload, dedup_key, run_at)
-                        values (?, ?::jsonb, ?, now() + make_interval(secs => ?))
+                        insert into jobs (type, payload, dedup_key, run_at, priority)
+                        values (?, ?::jsonb, ?, now() + make_interval(secs => ?), ?)
                         on conflict (dedup_key) where status in ('ready', 'running') do nothing""")
-                .params(type, payloadJson, dedupKey, delay.toMillis() / 1000.0)
+                .params(type, payloadJson, dedupKey, delay.toMillis() / 1000.0, priority)
                 .update();
+        if (n == 0 && priority > BACKGROUND) {
+            // the same job is already waiting from background polling: move it up instead of queueing a second one
+            jdbc.sql("""
+                            update jobs set priority = greatest(priority, ?), run_at = least(run_at, now())
+                            where dedup_key = ? and status = 'ready'""")
+                    .params(priority, dedupKey).update();
+        }
         return n == 1;
     }
 
-    // takes the oldest due job, or a running job whose worker stopped renewing its lease.
+    // takes the most urgent due job, oldest first, or a running job whose worker stopped renewing its lease.
     // skip locked means two workers never wait on or take the same row.
     public Optional<Job> claim(String workerId, Duration lease) {
         return jdbc.sql("""
@@ -44,7 +59,7 @@ public class JobQueue {
                             select id from jobs
                             where (status = 'ready' and run_at <= now())
                                or (status = 'running' and lease_until < now())
-                            order by run_at
+                            order by priority desc, run_at
                             limit 1
                             for update skip locked)
                         returning id, type, payload::text, attempts, max_attempts""")

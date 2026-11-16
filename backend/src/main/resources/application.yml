@@ -48,6 +48,8 @@ fineprint:
     # early-career titles only, so the collector stays small
     title-include: "(?i)\\b(new grad(uate)?s?|university grad(uate)?s?|early career|recent grad(uate)?s?|intern(ship)?s?|co-?op|graduate|class of 20\\d\\d)\\b|\\b20(27|28|29)\\b"
     title-exclude: "(?i)\\b(senior|sr|staff|principal|manager|director|lead|head)\\b"
+    # the boards below are the evaluation set. the hosted app turns this off and polls only boards users watch or save from
+    poll-configured-boards: true
     boards:
       - greenhouse:databricks
       - greenhouse:roblox

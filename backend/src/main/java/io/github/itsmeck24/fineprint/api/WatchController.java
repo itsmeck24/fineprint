@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.itsmeck24.fineprint.queue.JobQueue;
 import io.github.itsmeck24.fineprint.queue.Jobs;
 import io.github.itsmeck24.fineprint.store.PostingStore;
 
@@ -66,7 +67,7 @@ public class WatchController {
         long boardId = postings.boardId(board[0], board[1]);
         jdbc.sql("insert into watches (user_id, board_id) values (?, ?) on conflict do nothing")
                 .params(userId(jwt), boardId).update();
-        jobs.pollBoard(boardId);
+        jobs.pollBoard(boardId, JobQueue.USER_WAITING);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("boardId", boardId));
     }
 

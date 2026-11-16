@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.itsmeck24.fineprint.queue.JobQueue;
 import io.github.itsmeck24.fineprint.queue.Jobs;
 import io.github.itsmeck24.fineprint.store.PostingStore;
 import io.github.itsmeck24.fineprint.store.UserStore;
@@ -54,7 +55,7 @@ public class PostingController {
         long postingId = resolve(p).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT,
                 "this careers page hides the board name, open the job-boards.greenhouse.io link instead"));
         users.save(user.id(), postingId);
-        jobs.fetchPosting(postingId);
+        jobs.fetchPosting(postingId, JobQueue.USER_WAITING);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("id", postingId));
     }
 

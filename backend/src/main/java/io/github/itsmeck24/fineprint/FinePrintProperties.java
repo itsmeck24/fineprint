@@ -10,7 +10,8 @@ public record FinePrintProperties(Collector collector, Worker worker, Sources so
                                   List<String> corsOrigins) {
 
     public record Collector(boolean enabled, String userAgent, Duration minGap, Duration pollEvery,
-                            Duration detailRefresh, Duration closeAfter, String titleInclude, String titleExclude, List<String> boards) {
+                            Duration detailRefresh, Duration closeAfter, String titleInclude, String titleExclude, List<String> boards,
+                            boolean pollConfiguredBoards) {
     }
 
     public record Worker(boolean enabled, int threads, Duration lease, Duration idleSleep) {

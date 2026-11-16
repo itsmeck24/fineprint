@@ -45,6 +45,29 @@ class JobQueueTest extends DbTest {
         assertThat(queue.enqueue("t", "{}", "k1")).isTrue();
     }
 
+    // a link a user just saved must not wait behind hundreds of background fetches
+    @Test
+    void workAUserIsWaitingOnRunsFirst() {
+        for (int i = 0; i < 5; i++) {
+            queue.enqueue("fetch", "{}", "background-" + i);
+        }
+        queue.enqueue("fetch", "{}", "saved", Duration.ZERO, JobQueue.USER_WAITING);
+        assertThat(queue.claim("w", Duration.ofMinutes(1)).orElseThrow().type()).isEqualTo("fetch");
+        assertThat(jdbc.sql("select dedup_key from jobs where status = 'running'").query(String.class).single())
+                .isEqualTo("saved");
+    }
+
+    @Test
+    void savingAPostingAlreadyQueuedMovesItUp() {
+        queue.enqueue("fetch", "{}", "older");
+        queue.enqueue("fetch", "{}", "same");
+        assertThat(queue.enqueue("fetch", "{}", "same", Duration.ZERO, JobQueue.USER_WAITING)).isFalse();
+        assertThat(jdbc.sql("select count(*) from jobs where dedup_key = 'same'").query(Integer.class).single()).isEqualTo(1);
+        queue.claim("w", Duration.ofMinutes(1)).orElseThrow();
+        assertThat(jdbc.sql("select dedup_key from jobs where status = 'running'").query(String.class).single())
+                .isEqualTo("same");
+    }
+
     @Test
     void twoWorkersNeverClaimTheSameJob() throws Exception {
         for (int i = 0; i < 40; i++) {

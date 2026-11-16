@@ -25,6 +25,8 @@ services:
         value: "true"
       - key: FINEPRINT_WORKER_THREADS
         value: "1"
+      - key: FINEPRINT_COLLECTOR_POLL_CONFIGURED_BOARDS
+        value: "false"
       - key: FINEPRINT_COLLECTOR_ENABLED
         value: "true"
       - key: FINEPRINT_MAIL_PROVIDER
