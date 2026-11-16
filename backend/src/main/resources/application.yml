@@ -26,6 +26,7 @@ fineprint:
     resend-api-key: ""
     lease: 2m
     unknown-after: 23h
+    sender-threads: 4
     app-url: http://localhost:8081
   sources:
     greenhouse-base: https://boards-api.greenhouse.io/v1/boards/

@@ -25,6 +25,6 @@ public record FinePrintProperties(Collector collector, Worker worker, Sources so
     // provider is log, smtp or resend. unknown-after is how old a half-sent message may be before a retry
     // could no longer be deduplicated by the provider (resend keeps idempotency keys for 24 hours).
     public record Mail(String provider, String from, String smtpHost, int smtpPort, String resendBase,
-                       String resendApiKey, Duration lease, Duration unknownAfter, String appUrl) {
+                       String resendApiKey, Duration lease, Duration unknownAfter, String appUrl, int senderThreads) {
     }
 }

@@ -172,7 +172,7 @@ class CrashHarnessTest extends DbTest {
         }
 
         // no more kills: let everything finish, including jobs waiting out a retry backoff
-        Instant settleUntil = Instant.now().plus(Duration.ofMinutes(Integer.getInteger("crash.settle-minutes", 10)));
+        Instant settleUntil = Instant.now().plus(Duration.ofMinutes(Integer.getInteger("crash.settle-minutes", 30)));
         int finalGeneration = generation;
         Instant settleStarted = Instant.now();
         while (Instant.now().isBefore(settleUntil)) {

@@ -31,28 +31,34 @@ public class OutboxSender implements SmartLifecycle {
     private final FinePrintProperties.Mail props;
     private final Duration idleSleep;
     private final String id = ManagementFactory.getRuntimeMXBean().getName() + "/outbox";
+    private final int threads;
     private volatile boolean running;
-    private Thread thread;
+    private final java.util.List<Thread> workers = new java.util.ArrayList<>();
 
     public OutboxSender(NotificationStore store, MailSender mail, FinePrintProperties props) {
         this.store = store;
         this.mail = mail;
         this.props = props.mail();
         this.idleSleep = props.worker().idleSleep();
+        this.threads = Math.max(1, props.mail().senderThreads());
     }
 
     @Override
+    // several senders are safe: each claims a different row with skip locked
     public void start() {
         running = true;
-        thread = new Thread(this::loop, "outbox");
-        thread.start();
+        for (int i = 0; i < threads; i++) {
+            Thread t = new Thread(this::loop, "outbox-" + i);
+            workers.add(t);
+            t.start();
+        }
     }
 
     @Override
     public void stop() {
         running = false;
-        if (thread != null) {
-            thread.interrupt();
+        for (Thread t : workers) {
+            t.interrupt();
         }
     }
 
@@ -62,9 +68,10 @@ public class OutboxSender implements SmartLifecycle {
     }
 
     private void loop() {
+        String me = id + "-" + Thread.currentThread().getName();
         while (running) {
             try {
-                if (!sendOne()) {
+                if (!sendOne(me)) {
                     Thread.sleep(idleSleep.toMillis());
                 }
             } catch (InterruptedException e) {
@@ -82,6 +89,10 @@ public class OutboxSender implements SmartLifecycle {
 
     // returns false when nothing was due
     public boolean sendOne() throws InterruptedException {
+        return sendOne(id);
+    }
+
+    boolean sendOne(String id) throws InterruptedException {
         Optional<NotificationStore.Claimed> c = store.claim(id, props.lease());
         if (c.isEmpty()) {
             return false;
