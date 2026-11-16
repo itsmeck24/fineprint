@@ -7,7 +7,8 @@ spring:
     password: fineprint
 
 server:
-  port: 8080
+  # hosts like render set PORT
+  port: ${PORT:8080}
 
 fineprint:
   cors-origins:

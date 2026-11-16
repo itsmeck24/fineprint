@@ -1,0 +1,9 @@
+**/node_modules
+**/target
+web/dist
+web/dist-extension
+web/test-results
+docs
+results
+eval
+.git

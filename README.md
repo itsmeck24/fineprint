@@ -146,6 +146,19 @@ The worker polls the boards listed in `backend/src/main/resources/application.ym
 Browser extension: `cd web && npm ci && npm run build:extension`, then load `web/dist-extension` as an unpacked
 extension in Chrome and sign in from its options page.
 
+### Hosting
+
+`render.yaml` is a Render Blueprint. The root `Dockerfile` builds the React app into the Spring Boot jar, so one
+web service serves the app, the API, the worker and the hourly collector, next to a Render Postgres database.
+It fits the free plan: a local container capped at 512 MB and 0.1 CPU used about 200 MB. The free plan has limits:
+
+- the service sleeps after 15 minutes idle, so the first visit takes about a minute;
+- a free Postgres database is deleted after 30 days unless it is upgraded;
+- mail is set to `log`, so alerts show on the Watching page instead of being emailed. Set
+  `FINEPRINT_MAIL_PROVIDER=resend` with a key and a verified sender to email them.
+
+The project page in `docs/` is a static build served by GitHub Pages.
+
 ## Tests
 
 - `cd backend && ./mvnw verify`: 83 tests. Database tests run against real Postgres through Testcontainers. Job board

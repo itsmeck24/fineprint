@@ -41,7 +41,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/api/auth/**", "/api/health", "/error").permitAll()
                         .requestMatchers("/api/**").authenticated()
-                        .anyRequest().denyAll())
+                        // everything else is the bundled react app: static files and its page routes
+                        .anyRequest().permitAll())
                 .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()));
         return http.build();
     }

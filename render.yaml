@@ -1,0 +1,44 @@
+# render blueprint: the project page, the app, and its database.
+# free plans: the app sleeps after 15 minutes without visitors, and the free database is deleted after 30 days
+# unless it is moved to a paid plan.
+services:
+  - type: web
+    name: fineprint
+    runtime: static
+    buildCommand: echo "docs/ is built and committed by web npm run build:site"
+    staticPublishPath: ./docs
+
+  - type: web
+    name: fineprint-app
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fineprint-db
+          property: connectionString
+      - key: FINEPRINT_JWT_SECRET
+        generateValue: true
+      - key: FINEPRINT_WORKER_ENABLED
+        value: "true"
+      - key: FINEPRINT_WORKER_THREADS
+        value: "1"
+      - key: FINEPRINT_COLLECTOR_ENABLED
+        value: "true"
+      - key: FINEPRINT_MAIL_PROVIDER
+        value: log
+      - key: FINEPRINT_MAIL_SENDER_THREADS
+        value: "1"
+      - key: FINEPRINT_MAIL_APP_URL
+        value: https://fineprint-app.onrender.com
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+
+databases:
+  - name: fineprint-db
+    plan: free
+    databaseName: fineprint
+    user: fineprint
+    postgresMajorVersion: "16"
