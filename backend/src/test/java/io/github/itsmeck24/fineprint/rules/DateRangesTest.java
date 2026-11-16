@@ -66,5 +66,6 @@ class DateRangesTest {
     void internshipTermNeedsASeasonOrMonth() {
         assertThat(DateRanges.term("Data Science Intern [Summer 2027]").orElseThrow().end()).isEqualTo(YearMonth.of(2027, 8));
         assertThat(DateRanges.term("Software Engineering Intern (2027)")).isEmpty();
+        assertThat(DateRanges.term("2027 Summer Intern, MS/PhD").orElseThrow().end()).isEqualTo(YearMonth.of(2027, 8));
     }
 }

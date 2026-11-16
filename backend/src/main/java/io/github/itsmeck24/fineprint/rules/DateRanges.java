@@ -103,12 +103,20 @@ public final class DateRanges {
     // internship term from a title like "[Summer 2027]". needs a season or month, a bare year is too vague
     private static final Pattern TERM = Pattern.compile("(?i)\\b(" + WORD + ")\\.?\\s*,?\\s+(20\\d\\d)\\b");
 
+    private static final Pattern TERM_YEAR_FIRST = Pattern.compile("(?i)\\b(20\\d\\d)\\s+(" + WORD + ")\\b");
+
     public static Optional<Range> term(String title) {
-        Matcher m = TERM.matcher(title == null ? "" : title);
-        if (!m.find()) {
-            return Optional.empty();
+        String t = title == null ? "" : title;
+        Matcher m = TERM.matcher(t);
+        if (m.find()) {
+            return Optional.of(word(m.group(1), Integer.parseInt(m.group(2))));
         }
-        return Optional.of(word(m.group(1), Integer.parseInt(m.group(2))));
+        // "2027 Summer Intern"
+        Matcher y = TERM_YEAR_FIRST.matcher(t);
+        if (y.find()) {
+            return Optional.of(word(y.group(2), Integer.parseInt(y.group(1))));
+        }
+        return Optional.empty();
     }
 
     private static List<Range> ranges(List<Mention> ms) {

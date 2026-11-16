@@ -73,7 +73,7 @@ class SiteExportTest {
                 }
             }
         }
-        Path target = Path.of("..", "site", "public", "demo.json");
+        Path target = Path.of("..", "web", "site", "public", "demo.json");
         Files.createDirectories(target.getParent());
         Files.writeString(target, json.writeValueAsString(out) + "\n", StandardCharsets.UTF_8);
         System.out.println("wrote " + target + " with " + postings.size() + " postings");
