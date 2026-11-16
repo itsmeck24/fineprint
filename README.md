@@ -88,19 +88,46 @@ Edits planted into copies of the 108 test postings, checked with the code the wo
 A harness runs two real worker processes against a fake job board and a fake email provider, keeps changing every
 posting's rules, kills a random worker with `kill -9` every 1 to 4 seconds, and counts everything from the database.
 
-| Run | Kills (mid-job) | Changes recorded | Emails resent after a kill | Duplicate emails |
-| --- | --- | --- | --- | --- |
-| [507c223](results/crash-100-kills-20261115-200451.json) | 100 (99) | 2120 of 2120 | 93 | 0 |
-| [721d557](results/crash-500-kills-20261115-223927.json) | 500 (214) | 2199 of 2200 | 159 | 0 |
+| Run | Kills (mid-job) | Changes recorded | Emails sent | Resent after a kill | Duplicate emails |
+| --- | --- | --- | --- | --- | --- |
+| [507c223](results/crash-100-kills-20261115-200451.json) | 100 (99) | 2120 of 2120 | 4240 of 4240 | 93 | 0 |
+| [721d557](results/crash-500-kills-20261115-223927.json) | 500 (214) | 2199 of 2200 | 4398 of 4398 | 159 | 0 |
+| [31e9031](results/crash-500-kills-20261115-230536.json) | 500 (453) | 5840 of 5860 | 11680 of 11680 | 424 | 0 |
+| [3693e92](results/crash-500-kills-20261115-233352.json) | 500 (450) | 5840 of 5860 | 11680 of 11680 | 415 | 0 |
+| [f266a41](results/crash-500-kills-20261115-235704.json) | 500 (446) | 10700 of 10700 | 18739 of 21400 | 417 | 0 |
+| [f5411ae](results/crash-500-kills-20261116-002923.json) | 500 (355) | 11920 of 11920 | 23840 of 23840 | 896 | 0 |
 
-The 721d557 run found a real bug: when a listing showed a new version while a fetch for that posting was already
-running, the poll stored the new `updated_at` anyway, so that version was skipped until the daily refresh. It is fixed
-in 31e9031 with a regression test. The next two runs both came up 20 short at the same generation. The diagnostics added
-for the second one showed no pending, missing or unextracted work: the harness had written graduation years past 2099,
-which the date rules do not read, so its expected count was wrong. The harness was fixed in f266a41.
+Every run is kept, including the ones that failed:
 
-"Emails resent after a kill" counts messages that reached the provider twice because a worker died between sending
+- **721d557** found a real bug. When a listing showed a new version while a fetch for that posting was already running,
+  the poll stored the new `updated_at` anyway, so that version was skipped until the daily refresh. Fixed in 31e9031
+  with a regression test.
+- **31e9031 and 3693e92** both came up 20 short at the same generation. The diagnostics added for the second one showed
+  no pending, missing or unextracted work: the harness had written graduation years past 2099, which the date rules do
+  not read, so its expected count was wrong. Fixed in the harness in f266a41.
+- **f266a41** recorded every change, but 2661 emails were still queued when the harness stopped waiting: one sender
+  thread per process could not keep up. Senders run on several threads since f5411ae.
+- **f5411ae** is the clean run: every change recorded and every email sent once.
+
+"Resent after a kill" counts messages that reached the provider twice because a worker died between sending
 and recording. The idempotency key made the provider drop every repeat.
+
+### Throughput
+
+One worker process against a fake board that answers every request after 100 ms, 400 postings, each a fetch job and
+an extract job, host rate limit off, five runs per setting
+([throughput-20261116-010920.json](results/throughput-20261116-010920.json)):
+
+| Worker threads | Postings per second | sd |
+| --- | --- | --- |
+| 1 | 8.5 | 0.0 |
+| 2 | 16.9 | 0.0 |
+| 4 | 33.1 | 0.2 |
+| 8 | 64.8 | 0.2 |
+
+With one thread the board alone allows 10 per second, so claiming two jobs, reading the rules and writing the version
+take about 18 ms per posting, and 8 threads get 7.6 times the speed of one. Against real boards the limit is the
+2-second gap per host, not the queue.
 
 ## Run it
 

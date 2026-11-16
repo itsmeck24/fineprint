@@ -19,7 +19,7 @@ type EvalSummary = {
 };
 type CrashRun = {
   file: string; commit: string; kills: number; kills_with_work_in_flight: number; expected_changes: number;
-  recorded_changes: number; notifications: number; resent_after_kill: number; duplicate_emails: number; note: string;
+  recorded_changes: number; notifications: number; emails_sent: number; resent_after_kill: number; duplicate_emails: number; note: string;
 };
 type Results = {
   heldout: EvalSummary | null; after_fixes: EvalSummary | null; crash_runs: CrashRun[];
@@ -56,6 +56,13 @@ export function Site() {
     fetch("./demo.json").then((r) => r.json()).then(setDemo);
     fetch("./results.json").then((r) => r.json()).then(setResults);
   }, []);
+
+  // sections render after the data loads, so a link like #results has to be followed again
+  useEffect(() => {
+    if (results && location.hash) {
+      document.querySelector(location.hash)?.scrollIntoView();
+    }
+  }, [results]);
 
   const posting = demo?.postings[pick];
   const h = results?.heldout;
@@ -247,7 +254,7 @@ export function Site() {
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>Commit</th><th>Kills (mid-job)</th><th>Changes recorded</th><th>Emails resent after a kill</th><th>Duplicate emails</th><th>What it showed</th></tr>
+                <tr><th>Commit</th><th>Kills (mid-job)</th><th>Changes recorded</th><th>Emails sent</th><th>Resent after a kill</th><th>Duplicate emails</th><th>What it showed</th></tr>
               </thead>
               <tbody>
                 {results.crash_runs.map((c) => (
@@ -255,6 +262,7 @@ export function Site() {
                     <td><a href={`${REPO}/blob/main/results/${c.file}`}>{c.commit}</a></td>
                     <td>{c.kills} ({c.kills_with_work_in_flight})</td>
                     <td>{c.recorded_changes} of {c.expected_changes}</td>
+                    <td>{c.emails_sent} of {c.notifications}</td>
                     <td>{c.resent_after_kill}</td>
                     <td>{c.duplicate_emails}</td>
                     <td className="note">{c.note}</td>

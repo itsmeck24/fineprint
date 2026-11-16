@@ -255,6 +255,7 @@
    "expected_changes": 2120,
    "recorded_changes": 2120,
    "notifications": 4240,
+   "emails_sent": 4240,
    "resent_after_kill": 93,
    "duplicate_emails": 0,
    "note": "First run after the outbox landed."
@@ -267,6 +268,7 @@
    "expected_changes": 2200,
    "recorded_changes": 2199,
    "notifications": 4398,
+   "emails_sent": 4398,
    "resent_after_kill": 159,
    "duplicate_emails": 0,
    "note": "Found a real bug: a change seen in the listing while a fetch was running was skipped. Fixed in 31e9031."
@@ -279,9 +281,10 @@
    "expected_changes": 5860,
    "recorded_changes": 5840,
    "notifications": 11680,
+   "emails_sent": 11680,
    "resent_after_kill": 424,
    "duplicate_emails": 0,
-   "note": "Short of the expected count after a 3 minute wait, so lost and late work could not be told apart. Diagnostics added."
+   "note": "20 short at the same generation as the next run, same cause. Diagnostics added to tell lost work from late work."
   },
   {
    "file": "crash-500-kills-20261115-233352.json",
@@ -291,9 +294,36 @@
    "expected_changes": 5860,
    "recorded_changes": 5840,
    "notifications": 11680,
+   "emails_sent": 11680,
    "resent_after_kill": 415,
    "duplicate_emails": 0,
    "note": "Nothing lost. The harness wrote years past 2099, which the date rules do not read, so the expected count was wrong."
+  },
+  {
+   "file": "crash-500-kills-20261115-235704.json",
+   "commit": "f266a41",
+   "kills": 500,
+   "kills_with_work_in_flight": 446,
+   "expected_changes": 10700,
+   "recorded_changes": 10700,
+   "notifications": 21400,
+   "emails_sent": 18739,
+   "resent_after_kill": 417,
+   "duplicate_emails": 0,
+   "note": "Every change recorded, but the email outbox fell behind: one sender thread per process. Senders made multi-threaded."
+  },
+  {
+   "file": "crash-500-kills-20261116-002923.json",
+   "commit": "f5411ae",
+   "kills": 500,
+   "kills_with_work_in_flight": 355,
+   "expected_changes": 11920,
+   "recorded_changes": 11920,
+   "notifications": 23840,
+   "emails_sent": 23840,
+   "resent_after_kill": 896,
+   "duplicate_emails": 0,
+   "note": "Clean: every change recorded, every email sent once."
   }
  ],
  "change_detection": {
@@ -339,5 +369,64 @@
   ],
   "file": "change-detection-20261115-223932.json"
  },
- "throughput": null
+ "throughput": {
+  "results": [
+   {
+    "threads": 1,
+    "postings_per_second_mean": 8.5,
+    "postings_per_second_sd": 0.0,
+    "runs": [
+     8.4,
+     8.5,
+     8.5,
+     8.5,
+     8.5
+    ]
+   },
+   {
+    "threads": 2,
+    "postings_per_second_mean": 16.9,
+    "postings_per_second_sd": 0.0,
+    "runs": [
+     16.8,
+     17.0,
+     16.9,
+     16.9,
+     16.9
+    ]
+   },
+   {
+    "threads": 4,
+    "postings_per_second_mean": 33.1,
+    "postings_per_second_sd": 0.2,
+    "runs": [
+     33.0,
+     32.9,
+     33.4,
+     33.3,
+     33.1
+    ]
+   },
+   {
+    "threads": 8,
+    "postings_per_second_mean": 64.8,
+    "postings_per_second_sd": 0.2,
+    "runs": [
+     64.6,
+     64.7,
+     65.1,
+     64.8,
+     64.6
+    ]
+   }
+  ],
+  "command": "./mvnw test -Pcrash -Dtest=ThroughputBenchTest -Dbench.postings=400 -Dbench.delay-ms=100 -Dbench.repeats=5",
+  "commit": "f5411ae",
+  "uncommitted_changes": false,
+  "machine": "Mac OS X 27.2.1 aarch64, 12 cpus",
+  "java": "21.0.13.0.3",
+  "postgres": "postgres:16 in docker",
+  "workload": "400 postings, each one fetch job and one extract job, fake board answers after 100 ms, one worker process, host rate limit off",
+  "file": "throughput-20261116-010920.json"
+ }
 }

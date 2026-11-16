@@ -11,8 +11,10 @@ OUT = ROOT / "web" / "site" / "public" / "results.json"
 CRASH_NOTES = {
     "507c223": "First run after the outbox landed.",
     "721d557": "Found a real bug: a change seen in the listing while a fetch was running was skipped. Fixed in 31e9031.",
-    "31e9031": "Short of the expected count after a 3 minute wait, so lost and late work could not be told apart. Diagnostics added.",
+    "31e9031": "20 short at the same generation as the next run, same cause. Diagnostics added to tell lost work from late work.",
     "3693e92": "Nothing lost. The harness wrote years past 2099, which the date rules do not read, so the expected count was wrong.",
+    "f266a41": "Every change recorded, but the email outbox fell behind: one sender thread per process. Senders made multi-threaded.",
+    "f5411ae": "Clean: every change recorded, every email sent once.",
 }
 
 
@@ -66,6 +68,7 @@ def main():
             "expected_changes": c["expected_change_events"],
             "recorded_changes": c["recorded_change_events"],
             "notifications": c["expected_notifications"],
+            "emails_sent": c["notification_status"]["sent"],
             "resent_after_kill": c["provider_keys_requested_more_than_once"],
             "duplicate_emails": c["duplicate_deliveries"],
             "note": CRASH_NOTES.get(c["commit"], ""),
