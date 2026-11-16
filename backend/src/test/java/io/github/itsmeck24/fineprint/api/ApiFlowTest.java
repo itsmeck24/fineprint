@@ -134,6 +134,20 @@ class ApiFlowTest extends DbTest {
     }
 
     @Test
+    void aLinkToAMissingJobSaysNotFound() throws Exception {
+        String a = register("typo@example.test");
+        long id = call("POST", "/postings", a, "{\"url\":\"https://job-boards.greenhouse.io/acme/jobs/404\"}")
+                .body().path("id").asLong();
+        Instant until = Instant.now().plusSeconds(20);
+        String status = "";
+        while (Instant.now().isBefore(until) && !status.equals("not_found")) {
+            status = call("GET", "/postings/" + id, a, null).body().path("status").asString();
+            Thread.sleep(100);
+        }
+        assertThat(status).isEqualTo("not_found");
+    }
+
+    @Test
     void usersOnlySeeTheirOwnPostings() throws Exception {
         String a = register("owner@example.test");
         String b = register("other@example.test");

@@ -27,8 +27,8 @@ export function Login({ api, onToken }: { api: Api; onToken: (t: string) => void
       <h1>FinePrint</h1>
       <p className="muted">The eligibility rules in job postings and their application forms, with the sentence each one comes from.</p>
       <form onSubmit={submit}>
-        <label>Email <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
-        <label>Password <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} /></label>
+        <label>Email <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required /></label>
+        <label>Password <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={8} /></label>
         {mode === "register" && (
           <>
             <label>Graduation month <input type="month" value={gradMonth} onChange={(e) => setGradMonth(e.target.value)} required /></label>
@@ -48,6 +48,9 @@ export function Login({ api, onToken }: { api: Api; onToken: (t: string) => void
       <button className="link" onClick={() => setMode(mode === "login" ? "register" : "login")}>
         {mode === "login" ? "New here? Create an account" : "Have an account? Sign in"}
       </button>
+      <p className="muted small">
+        <a href="https://itsmeck24.github.io/fineprint/">How it works and how well it does</a>
+      </p>
     </div>
   );
 }

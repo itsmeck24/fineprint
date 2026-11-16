@@ -32,6 +32,31 @@ public final class Eligibility {
     static final List<String> AUTH_ORDER = List.of("citizenship_required", "clearance_required", "no_sponsorship",
             "hedged", "sponsors", "authorization_required", "export_control");
 
+    static final java.util.Map<String, String> DEGREE_NAMES = java.util.Map.of(
+            "bachelor", "a bachelor's student", "master", "a master's student", "phd", "a PhD student");
+    static final java.util.Map<String, String> STANCE_NOTES = java.util.Map.of(
+            "citizenship_required", "requires US citizenship",
+            "clearance_required", "requires a security clearance or eligibility for one",
+            "no_sponsorship", "says it will not sponsor a visa",
+            "hedged", "sponsorship might be possible but is not promised",
+            "sponsors", "says it sponsors visas",
+            "authorization_required", "you must already be allowed to work, sponsorship is not mentioned",
+            "export_control", "export control rules may apply to some candidates");
+
+    static String month(java.time.YearMonth m) {
+        return m.getMonth().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.ENGLISH) + " " + m.getYear();
+    }
+
+    static String window(DateRanges.Range r) {
+        if (r.start() == null) {
+            return "which runs up to " + month(r.end());
+        }
+        if (r.end() == null) {
+            return "which runs from " + month(r.start()) + " on";
+        }
+        return "which runs from " + month(r.start()) + " to " + month(r.end());
+    }
+
     public static List<Rule> card(Profile p, String title, List<Criterion> criteria) {
         return List.of(grad(p, criteria), degree(p, criteria), returnToSchool(p, title, criteria), auth(criteria));
     }
@@ -44,8 +69,8 @@ public final class Eligibility {
         for (Criterion c : rules) {
             boolean in = c.range().contains(p.gradMonth());
             fits += in ? 1 : 0;
-            reasons.add(new Reason(c.source(), c.quote(), (in ? "includes " : "excludes ") + p.gradMonth()
-                    + " (window " + c.range() + ")"));
+            reasons.add(new Reason(c.source(), c.quote(), month(p.gradMonth()) + (in ? " is inside" : " is outside")
+                    + " the graduation window, " + window(c.range())));
         }
         Optional<Boolean> formFits = Optional.empty();
         for (Criterion c : form) {
@@ -55,8 +80,8 @@ public final class Eligibility {
             }
             boolean in = c.range().contains(p.gradMonth());
             formFits = Optional.of(in);
-            reasons.add(new Reason("form", c.quote(), in ? "a listed option covers " + p.gradMonth()
-                    : "only a catch-all option fits " + p.gradMonth()));
+            reasons.add(new Reason("form", c.quote(), in ? "a listed option covers " + month(p.gradMonth())
+                    : "no listed option covers " + month(p.gradMonth()) + ", only a catch-all like \"Other\""));
         }
         if (rules.isEmpty()) {
             return new Rule(Criterion.GRAD, form.isEmpty() ? UNKNOWN : SCREENED, false, reasons);
@@ -75,7 +100,7 @@ public final class Eligibility {
         for (Criterion c : rules) {
             boolean fits = degreeFits(c.value(), p.degreeLevel());
             ok += fits ? 1 : 0;
-            reasons.add(new Reason(c.source(), c.quote(), (fits ? "fits " : "does not fit ") + p.degreeLevel()));
+            reasons.add(new Reason(c.source(), c.quote(), (fits ? "lets in " : "does not let in ") + DEGREE_NAMES.get(p.degreeLevel())));
         }
         for (Criterion c : of(all, Criterion.DEGREE, true)) {
             reasons.add(new Reason("form", c.quote(), "the form asks about your degree"));
@@ -98,7 +123,8 @@ public final class Eligibility {
         List<Reason> reasons = new ArrayList<>();
         Optional<DateRanges.Range> term = DateRanges.term(title);
         for (Criterion c : rules) {
-            String note = term.map(t -> "internship ends " + t.end()).orElse("internship dates not found in the title");
+            String note = term.map(t -> "you must still be enrolled after the internship ends in " + month(t.end()))
+                    .orElse("the internship dates are not in the title, so this cannot be checked");
             reasons.add(new Reason(c.source(), c.quote(), note));
         }
         for (Criterion c : of(all, Criterion.RETURN, true)) {
@@ -120,7 +146,7 @@ public final class Eligibility {
         boolean yes = false;
         boolean no = false;
         for (Criterion c : rules) {
-            reasons.add(new Reason(c.source(), c.quote(), c.value()));
+            reasons.add(new Reason(c.source(), c.quote(), STANCE_NOTES.getOrDefault(c.value(), c.value())));
             // a value missing from the list ranks last, never first
             if (!AUTH_ORDER.contains(c.value())) {
                 continue;

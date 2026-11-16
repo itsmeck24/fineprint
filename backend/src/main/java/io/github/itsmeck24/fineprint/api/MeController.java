@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.itsmeck24.fineprint.FinePrintProperties;
 import io.github.itsmeck24.fineprint.store.NotificationStore;
 import io.github.itsmeck24.fineprint.store.UserStore;
 
@@ -30,10 +31,13 @@ public class MeController {
 
     private final UserStore users;
     private final NotificationStore notifications;
+    private final boolean emailAlerts;
 
-    public MeController(UserStore users, NotificationStore notifications) {
+    public MeController(UserStore users, NotificationStore notifications, FinePrintProperties props) {
         this.users = users;
         this.notifications = notifications;
+        // with the log provider alerts are only listed in the app, so the app should not promise email
+        this.emailAlerts = !"log".equals(props.mail().provider());
     }
 
     @GetMapping("/notifications")
@@ -47,13 +51,14 @@ public class MeController {
     }
 
     @GetMapping("/me")
-    public Map<String, String> me(@AuthenticationPrincipal Jwt jwt) {
+    public Map<String, Object> me(@AuthenticationPrincipal Jwt jwt) {
         UserStore.User u = user(jwt);
-        return Map.of("email", u.email(), "gradMonth", u.gradMonth().toString(), "degreeLevel", u.degreeLevel());
+        return Map.of("email", u.email(), "gradMonth", u.gradMonth().toString(), "degreeLevel", u.degreeLevel(),
+                "emailAlerts", emailAlerts);
     }
 
     @PutMapping("/me")
-    public Map<String, String> update(@AuthenticationPrincipal Jwt jwt, @RequestBody Profile p) {
+    public Map<String, Object> update(@AuthenticationPrincipal Jwt jwt, @RequestBody Profile p) {
         UserStore.User u = user(jwt);
         YearMonth grad = AuthController.parseMonth(p.gradMonth());
         users.updateProfile(u.id(), grad, AuthController.parseDegree(p.degreeLevel()));

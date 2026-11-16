@@ -52,7 +52,10 @@ public class PostingViews {
         Row r = jdbc.sql("""
                         select p.title, b.token, b.ats, p.url, p.last_detail_at,
                                (select count(*) from posting_versions v where v.posting_id = p.id)::int,
-                               p.status
+                               -- a link that has never loaded and already missed once is most likely mistyped.
+                               -- closing still waits for a second miss an hour later, this only changes what is shown
+                               case when p.status = 'open' and p.last_detail_at is null and p.miss_count > 0
+                                    then 'not_found' else p.status end
                         from postings p join boards b on b.id = p.board_id where p.id = ?""")
                 .param(postingId)
                 .query((rs, n) -> new Row(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),

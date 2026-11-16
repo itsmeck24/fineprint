@@ -1,8 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { ApiError, type Api, type Posting } from "../api";
+import { companyName } from "../names";
 
 const SHORT: Record<string, string> = { matches: "fits", conflicts: "rules you out", screened: "asked on form", unknown: "not stated" };
+const STATUS: Record<string, string> = { closed: "closed", unreachable: "board not answering", not_found: "no job at this link" };
+const KIND: Record<string, string> = { grad_window: "Graduation", degree: "Degree", return_to_school: "Return to school" };
 
 export function Postings({ api, onAuthLost }: { api: Api; onAuthLost: () => void }) {
   const [list, setList] = useState<Posting[] | null>(null);
@@ -50,13 +53,13 @@ export function Postings({ api, onAuthLost }: { api: Api; onAuthLost: () => void
       <ul className="postings">
         {list?.map((p) => (
           <li key={p.id}>
-            <Link to={`/postings/${p.id}`} className="title">{p.title || "Fetching..."}</Link>
-            <span className="muted"> {p.company}{p.status !== "open" ? ` (${p.status})` : ""}</span>
+            <Link to={`/postings/${p.id}`} className="title">{p.title || (p.status === "not_found" ? "Job not found" : "Fetching...")}</Link>
+            <span className="muted"> {companyName(p.company)}{p.status !== "open" ? ` (${STATUS[p.status] ?? p.status})` : ""}</span>
             <div className="chips">
-              {!p.ready && <span className="label plain">reading posting</span>}
+              {!p.ready && p.status === "open" && <span className="label plain">reading posting</span>}
               {p.rules.filter((r) => r.kind !== "work_auth").map((r) => (
                 <span key={r.kind} className={`label ${r.label === "conflicts" ? "bad" : r.label === "matches" ? "good" : "plain"}`}>
-                  {r.kind.replace("_", " ")}: {SHORT[r.label] ?? r.label}
+                  {KIND[r.kind] ?? r.kind}: {SHORT[r.label] ?? r.label}
                 </span>
               ))}
             </div>

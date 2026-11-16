@@ -34,7 +34,7 @@ class EligibilityTest {
         Eligibility.Rule r = rule("Backend Intern 2027", "Pursuing a degree and graduating by June 2028", form, Criterion.GRAD);
         assertThat(r.label()).isEqualTo(Eligibility.MATCHES);
         assertThat(r.sourcesDisagree()).isTrue();
-        assertThat(r.reasons()).extracting(Eligibility.Reason::note).anyMatch(n -> n.startsWith("only a catch-all"));
+        assertThat(r.reasons()).extracting(Eligibility.Reason::note).anyMatch(n -> n.startsWith("no listed option covers May 2027"));
     }
 
     @Test

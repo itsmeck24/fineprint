@@ -16,12 +16,13 @@ export type Posting = {
   changes: Change[];
 };
 export type Watch = { boardId: number; ats: string; token: string; since: string; openPostings: number };
-export type Me = { email: string; gradMonth: string; degreeLevel: string };
+export type Me = { email: string; gradMonth: string; degreeLevel: string; emailAlerts: boolean };
 export type Notification = { id: number; kind: string; subject: string; status: string; createdAt: string; sentAt: string | null };
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
-    super(message);
+    // server reasons are written lower case for logs, the page shows them as a sentence
+    super(message.charAt(0).toUpperCase() + message.slice(1));
   }
 }
 
@@ -31,7 +32,13 @@ export function client(base: string, token: () => string | null) {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     const t = token();
     if (t) headers["Authorization"] = `Bearer ${t}`;
-    const res = await fetch(base + "/api" + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    let res: Response;
+    try {
+      res = await fetch(base + "/api" + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    } catch {
+      // the free host sleeps when idle and takes about a minute to wake
+      throw new ApiError(0, "could not reach the server. It may be waking up, try again in a minute.");
+    }
     if (!res.ok) {
       let msg = res.statusText || `request failed (${res.status})`;
       try {
