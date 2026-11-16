@@ -7,19 +7,13 @@ ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "results"
 OUT = ROOT / "web" / "site" / "public" / "results.json"
 
-# what each crash run found, in the words of the commit that followed it
-CRASH_NOTES = {
-    "507c223": "First run after the outbox landed.",
-    "721d557": "Found a real bug: a change seen in the listing while a fetch was running was skipped. Fixed in 31e9031.",
-    "31e9031": "20 short at the same generation as the next run, same cause. Diagnostics added to tell lost work from late work.",
-    "3693e92": "Nothing lost. The harness wrote years past 2099, which the date rules do not read, so the expected count was wrong.",
-    "f266a41": "Every change recorded, but the email outbox fell behind: one sender thread per process. Senders made multi-threaded.",
-    "f5411ae": "Clean: every change recorded, every email sent once.",
-}
-
-
 def load(name):
     return json.loads((RESULTS / name).read_text())
+
+
+def without_commit(r):
+    # the page shows results, not build history; the commit stays in the results file itself
+    return {k: v for k, v in r.items() if k != "commit"}
 
 
 def eval_summary(path):
@@ -43,7 +37,6 @@ def eval_summary(path):
         "note": r.get("note"),
         "postings": r["postings"],
         "companies": len(r["boards"]),
-        "commit": r["commit"],
         "variants": variants,
         "form_value": run["form_value"],
         "llm_median_seconds": run["llm_latency_seconds"]["median"],
@@ -62,7 +55,6 @@ def main():
         c = load(p.name)
         crash.append({
             "file": p.name,
-            "commit": c["commit"],
             "kills": c["kills"],
             "kills_with_work_in_flight": c["kills_with_work_in_flight"],
             "expected_changes": c["expected_change_events"],
@@ -71,10 +63,9 @@ def main():
             "emails_sent": c["notification_status"]["sent"],
             "resent_after_kill": c["provider_keys_requested_more_than_once"],
             "duplicate_emails": c["duplicate_deliveries"],
-            "note": CRASH_NOTES.get(c["commit"], ""),
         })
-    changes = [load(p.name) | {"file": p.name} for p in sorted(RESULTS.glob("change-detection-*.json"))]
-    throughput = [load(p.name) | {"file": p.name} for p in sorted(RESULTS.glob("throughput-*.json"))]
+    changes = [without_commit(load(p.name)) | {"file": p.name} for p in sorted(RESULTS.glob("change-detection-*.json"))]
+    throughput = [without_commit(load(p.name)) | {"file": p.name} for p in sorted(RESULTS.glob("throughput-*.json"))]
     out = {
         "heldout": eval_summary(heldout[-1]) if heldout else None,
         "after_fixes": eval_summary(postfix[-1]) if postfix else None,

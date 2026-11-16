@@ -133,23 +133,19 @@
 .site table.crash tr.short td:first-child a { color: var(--redpen); }
 .site table.crash td.note { color: var(--ink-soft); font-size: 0.86rem; max-width: 40ch; }
 .ledger { list-style: none; padding: 0; margin: 4px 0 0; }
-.ledger li { display: grid; grid-template-columns: 90px 1fr; padding: 7px 0; border-bottom: 1px dotted var(--rule); }
+.ledger li { display: grid; grid-template-columns: 7.5rem 1fr; column-gap: 12px; padding: 7px 0; border-bottom: 1px dotted var(--rule); }
 .ledger .count { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .bars { display: grid; gap: 8px; margin: 10px 0; max-width: 640px; }
 .bar-row { display: grid; grid-template-columns: 90px 1fr 70px; gap: 12px; align-items: center; font-size: 0.88rem; }
 .bar-label, .bar-value { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft); }
 .bar-track { height: 10px; border-bottom: 1px solid var(--rule); }
 .bar { display: block; height: 10px; background: var(--ink); }
-.fn { font-family: var(--mono); font-size: 0.72em; vertical-align: super; text-decoration: none; color: var(--ink-soft); margin-left: 1px; }
-.fn:hover { color: var(--ink); text-decoration: underline; }
 
 /* use */
 .use { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
 .use h3 { font-size: 1.3rem; margin: 0 0 6px; }
 .use p { color: var(--ink-soft); }
 
-.footnotes { border-top: 1px solid var(--rule); padding: 18px 0 0; }
-.footnotes ol { margin: 0; padding-left: 22px; font-family: var(--mono); font-size: 0.76rem; color: var(--ink-soft); }
 footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 32px; padding-top: 16px;
   border-top: 1px solid var(--rule); font-family: var(--mono); font-size: 0.72rem; color: var(--pencil); }
 

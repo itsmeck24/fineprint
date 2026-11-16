@@ -15,15 +15,15 @@ type Variant = {
   false_matches: number; truth_conflicts: number; false_conflicts: number;
 };
 type EvalSummary = {
-  file: string; note: string | null; postings: number; companies: number; commit: string; runs: number;
+  file: string; note: string | null; postings: number; companies: number; runs: number;
   variants: Record<string, Variant>; llm_median_seconds: number;
   form_value: Record<string, { unknown_with_text_only: number; informed_after_reading_form: number }>;
   spread: Record<string, { mean: number; sd: number; runs: number }>;
 };
 type CrashRun = {
-  file: string; commit: string; kills: number; kills_with_work_in_flight: number; expected_changes: number;
+  file: string; kills: number; kills_with_work_in_flight: number; expected_changes: number;
   recorded_changes: number; notifications: number; emails_sent: number; resent_after_kill: number;
-  duplicate_emails: number; note: string;
+  duplicate_emails: number;
 };
 type Results = {
   heldout: EvalSummary | null; after_fixes: EvalSummary | null; crash_runs: CrashRun[];
@@ -43,7 +43,6 @@ const CASES: Record<string, string> = {
 };
 
 const f2 = (x: number | null | undefined) => (x === null || x === undefined ? "none" : x.toFixed(2));
-const src = (file: string) => `${REPO}/blob/main/results/${file}`;
 
 function Section({ n, id, title, children }: { n: number; id: string; title: string; children: React.ReactNode }) {
   return (
@@ -55,10 +54,6 @@ function Section({ n, id, title, children }: { n: number; id: string; title: str
       </div>
     </section>
   );
-}
-
-function Fn({ n, file }: { n: number; file: string }) {
-  return <a className="fn" href={src(file)} title={file}>[{n}]</a>;
 }
 
 export function Site() {
@@ -82,12 +77,6 @@ export function Site() {
   const h = results?.heldout;
   const silent = h?.form_value.work_auth;
   const clean = results?.crash_runs[results.crash_runs.length - 1];
-  const footnotes: string[] = [];
-  const fn = (file: string) => {
-    if (!footnotes.includes(file)) footnotes.push(file);
-    return <Fn n={footnotes.indexOf(file) + 1} file={file} />;
-  };
-
   return (
     <div className="site">
       <header className="top">
@@ -95,7 +84,7 @@ export function Site() {
         <nav>
           <a href="#demo">Try it</a>
           <a href="#how">How it works</a>
-          <a href="#evidence">Evidence</a>
+          <a href="#evidence">Results</a>
           <a href={REPO}>Code</a>
           <a className="pill" href={LIVE_APP}>Open the app</a>
         </nav>
@@ -107,7 +96,7 @@ export function Site() {
         <Section n={1} id="why" title="The rules live in the form, not the title">
           <div className="findings">
             <div><strong>{silent.unknown_with_text_only}<span>/{h.postings}</span></strong>
-              <p>held-out postings say nothing about sponsorship in the description {fn(h.file)}</p></div>
+              <p>test postings say nothing about sponsorship in the description</p></div>
             <div><strong>{silent.informed_after_reading_form}</strong>
               <p>of those ask about it on the application form instead</p></div>
             <div><strong>{h.variants.rules.false_matches}<span>/{h.variants.rules.truth_conflicts}</span></strong>
@@ -189,19 +178,18 @@ export function Site() {
       </Section>
 
       {h && results && (
-        <Section n={4} id="evidence" title="Evidence">
+        <Section n={4} id="evidence" title="Results">
           <div className="exhibit">
-            <p className="exhibit-label">Exhibit A &middot; extraction on {h.postings} postings from {h.companies} companies the rules were never written against</p>
+            <p className="exhibit-label">Exhibit A &middot; {h.postings} postings from {h.companies} companies the rules were never written against</p>
             <div className="table-wrap">
               <table>
-                <thead><tr><th></th><th>Graduation F1</th><th>Degree F1</th><th>Card accuracy</th><th>False "matches you"</th></tr></thead>
+                <thead><tr><th></th><th>Card accuracy</th><th>Said "matches you" when the student was ruled out</th></tr></thead>
                 <tbody>
                   {VARIANTS.map(([k, name]) => {
                     const v = h.variants[k];
                     return v && (
                       <tr key={k} className={k === "rules" ? "lead-row" : ""}>
-                        <td>{name}</td><td>{f2(v.grad_f1)}</td><td>{f2(v.degree_f1)}</td><td>{f2(v.card_accuracy)}</td>
-                        <td>{v.false_matches} of {v.truth_conflicts}</td>
+                        <td>{name}</td><td>{f2(v.card_accuracy)}</td><td>{v.false_matches} of {v.truth_conflicts}</td>
                       </tr>
                     );
                   })}
@@ -209,14 +197,8 @@ export function Site() {
               </table>
             </div>
             <p className="exhibit-note">
-              Labels were written from each posting's text and form and committed before anything was scored {fn(h.file)}.
-              Local model: qwen3:14b on a laptop, median {h.llm_median_seconds} s per posting, {h.runs} runs, spread at most{" "}
-              {Math.max(...Object.values(h.spread).map((s) => s.sd)).toFixed(3)}.
-              {results.after_fixes && (
-                <> After fixing the rule bugs these results exposed, the rules reach {f2(results.after_fixes.variants.rules.card_accuracy)} card
-                  accuracy with {results.after_fixes.variants.rules.false_matches} false matches on the same postings, which is no longer
-                  a held-out number {fn(results.after_fixes.file)}.</>
-              )}
+              Labels were written from each posting's text and form before anything was scored. The local model is
+              qwen3:14b running on a laptop, about {Math.round(h.llm_median_seconds)} seconds per posting.
             </p>
           </div>
 
@@ -234,51 +216,37 @@ export function Site() {
               <p className="exhibit-note">
                 Each edit was planted into a copy of a test posting and run through the code the worker uses. The missed
                 year moves are postings whose window the rules never read: change detection sees only what extraction
-                sees {fn(results.change_detection.file)}.
+                sees.
               </p>
             </div>
           )}
 
-          <div className="exhibit">
-            <p className="exhibit-label">Exhibit C &middot; kill -9, repeatedly. Every run is kept, failures included.</p>
-            <div className="table-wrap">
-              <table className="crash">
-                <thead><tr><th>Commit</th><th>Kills</th><th>Changes</th><th>Emails sent</th><th>Duplicates</th><th>What it showed</th></tr></thead>
-                <tbody>
-                  {results.crash_runs.map((c) => {
-                    const ok = c.recorded_changes === c.expected_changes && c.emails_sent === c.notifications;
-                    return (
-                      <tr key={c.file} className={ok ? "" : "short"}>
-                        <td><a href={src(c.file)}>{c.commit}</a></td>
-                        <td data-label="Kills">{c.kills} <span className="muted">({c.kills_with_work_in_flight} mid-job)</span></td>
-                        <td data-label="Changes">{c.recorded_changes}/{c.expected_changes}</td>
-                        <td data-label="Emails sent">{c.emails_sent}/{c.notifications}</td>
-                        <td data-label="Duplicates">{c.duplicate_emails}</td>
-                        <td className="note">{c.note}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            {clean && (
+          {clean && (
+            <div className="exhibit">
+              <p className="exhibit-label">Exhibit C &middot; killing workers in the middle of their work</p>
+              <ul className="ledger">
+                <li><span className="count">{clean.kills}</span><span>random <code>kill -9</code>s, {clean.kills_with_work_in_flight} of them mid-job</span></li>
+                <li><span className="count">{clean.recorded_changes}/{clean.expected_changes}</span><span>rule changes recorded</span></li>
+                <li><span className="count">{clean.emails_sent}/{clean.notifications}</span><span>alerts sent</span></li>
+                <li><span className="count">{clean.duplicate_emails}</span><span>duplicate alerts</span></li>
+              </ul>
               <p className="exhibit-note">
-                Two worker processes run against a fake job board and a fake email provider while a killer stops one at a
-                random moment every one to four seconds. In the last run {clean.resent_after_kill} emails reached the
-                provider twice because a worker died between sending and recording; the idempotency key dropped every
-                repeat.
+                Two worker processes run against a fake job board and a fake email provider while one is killed at a
+                random moment every one to four seconds. An earlier run lost one change in 2,200: a posting updated while
+                its fetch was still running got skipped. That race is fixed and covered by a test.
               </p>
-            )}
-          </div>
+            </div>
+          )}
 
           {results.throughput && (
             <div className="exhibit">
               <p className="exhibit-label">Exhibit D &middot; throughput of one worker process</p>
               <Bars rows={results.throughput.results} />
               <p className="exhibit-note">{results.throughput.workload}. Against real boards the limit is the two-second
-                gap per host, not the queue {fn(results.throughput.file)}.</p>
+                gap per host, not the queue.</p>
             </div>
           )}
+          <p className="muted small">The saved output of every test run is in the <a href={`${REPO}/tree/main/results`}>results folder</a>.</p>
         </Section>
       )}
 
@@ -298,14 +266,6 @@ export function Site() {
           </div>
         </div>
       </Section>
-
-      {footnotes.length > 0 && (
-        <section className="footnotes">
-          <ol>
-            {footnotes.map((f) => <li key={f}><a href={src(f)}>results/{f}</a></li>)}
-          </ol>
-        </section>
-      )}
 
       <footer>
         <span>FinePrint &middot; Charith Kutikuppala &middot; MIT license</span>
