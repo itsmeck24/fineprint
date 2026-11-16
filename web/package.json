@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build && npm run build:extension",
     "typecheck": "tsc -b",
     "e2e": "playwright test",
-    "build:extension": "vite build -c vite.extension.config.ts --mode content && vite build -c vite.extension.config.ts --mode background && vite build -c vite.extension.config.ts --mode options"
+    "build:extension": "vite build -c vite.extension.config.ts --mode content && vite build -c vite.extension.config.ts --mode background && vite build -c vite.extension.config.ts --mode options",
+    "build:site": "python3 ../eval/site_data.py && vite build -c vite.site.config.ts",
+    "dev:site": "vite -c vite.site.config.ts"
   },
   "dependencies": {
     "react": "19.3.1",

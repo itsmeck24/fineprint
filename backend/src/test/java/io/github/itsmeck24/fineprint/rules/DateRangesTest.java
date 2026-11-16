@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-// wording shaped like the gate postings, written by hand
+// short sentences in the style of real postings, not copied from them
 class DateRangesTest {
 
     @ParameterizedTest

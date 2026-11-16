@@ -1,0 +1,343 @@
+{
+ "heldout": {
+  "file": "eval-test-20261115-235727.json",
+  "note": null,
+  "postings": 108,
+  "companies": 13,
+  "commit": "f266a41",
+  "variants": {
+   "title_only": {
+    "grad_f1": null,
+    "degree_f1": 0.7,
+    "return_f1": null,
+    "stance_stated_f1": null,
+    "card_accuracy": 0.647,
+    "false_matches": 1,
+    "truth_conflicts": 177,
+    "false_conflicts": 0
+   },
+   "rules_text_only": {
+    "grad_f1": 0.828,
+    "degree_f1": 0.882,
+    "return_f1": null,
+    "stance_stated_f1": 0.667,
+    "card_accuracy": 0.918,
+    "false_matches": 0,
+    "truth_conflicts": 177,
+    "false_conflicts": 29
+   },
+   "rules": {
+    "grad_f1": 0.828,
+    "degree_f1": 0.882,
+    "return_f1": null,
+    "stance_stated_f1": 0.667,
+    "card_accuracy": 0.918,
+    "false_matches": 0,
+    "truth_conflicts": 177,
+    "false_conflicts": 29
+   },
+   "llm": {
+    "grad_f1": 0.787,
+    "degree_f1": 0.897,
+    "return_f1": 0.667,
+    "stance_stated_f1": 0.698,
+    "card_accuracy": 0.935,
+    "false_matches": 1,
+    "truth_conflicts": 177,
+    "false_conflicts": 29
+   },
+   "hybrid": {
+    "grad_f1": 0.839,
+    "degree_f1": 0.883,
+    "return_f1": 0.667,
+    "stance_stated_f1": 0.698,
+    "card_accuracy": 0.949,
+    "false_matches": 1,
+    "truth_conflicts": 177,
+    "false_conflicts": 26
+   }
+  },
+  "form_value": {
+   "grad_window": {
+    "unknown_with_text_only": 81,
+    "informed_after_reading_form": 4
+   },
+   "work_auth": {
+    "unknown_with_text_only": 97,
+    "informed_after_reading_form": 86
+   }
+  },
+  "llm_median_seconds": 13.6,
+  "spread": {
+   "llm.grad_window_exact.f1": {
+    "mean": 0.787,
+    "sd": 0.0,
+    "runs": 3
+   },
+   "llm.degree_exact.f1": {
+    "mean": 0.895,
+    "sd": 0.003,
+    "runs": 3
+   },
+   "llm.work_auth_stance_accuracy": {
+    "mean": 0.883,
+    "sd": 0.005,
+    "runs": 3
+   },
+   "hybrid.grad_window_exact.f1": {
+    "mean": 0.839,
+    "sd": 0.0,
+    "runs": 3
+   },
+   "hybrid.degree_exact.f1": {
+    "mean": 0.883,
+    "sd": 0.0,
+    "runs": 3
+   },
+   "hybrid.work_auth_stance_accuracy": {
+    "mean": 0.883,
+    "sd": 0.005,
+    "runs": 3
+   }
+  },
+  "runs": 3
+ },
+ "after_fixes": {
+  "file": "eval-test-20261116-001153.json",
+  "note": "after fixing rule errors found while reading test results; not a held-out number",
+  "postings": 108,
+  "companies": 13,
+  "commit": "795195d",
+  "variants": {
+   "title_only": {
+    "grad_f1": null,
+    "degree_f1": 0.7,
+    "return_f1": null,
+    "stance_stated_f1": null,
+    "card_accuracy": 0.647,
+    "false_matches": 1,
+    "truth_conflicts": 177,
+    "false_conflicts": 0
+   },
+   "rules_text_only": {
+    "grad_f1": 0.889,
+    "degree_f1": 0.961,
+    "return_f1": 1.0,
+    "stance_stated_f1": 0.815,
+    "card_accuracy": 0.966,
+    "false_matches": 0,
+    "truth_conflicts": 177,
+    "false_conflicts": 13
+   },
+   "rules": {
+    "grad_f1": 0.889,
+    "degree_f1": 0.961,
+    "return_f1": 1.0,
+    "stance_stated_f1": 0.815,
+    "card_accuracy": 0.966,
+    "false_matches": 0,
+    "truth_conflicts": 177,
+    "false_conflicts": 13
+   },
+   "llm": {
+    "grad_f1": 0.787,
+    "degree_f1": 0.897,
+    "return_f1": 0.667,
+    "stance_stated_f1": 0.698,
+    "card_accuracy": 0.935,
+    "false_matches": 1,
+    "truth_conflicts": 177,
+    "false_conflicts": 29
+   },
+   "hybrid": {
+    "grad_f1": 0.857,
+    "degree_f1": 0.913,
+    "return_f1": 0.933,
+    "stance_stated_f1": 0.698,
+    "card_accuracy": 0.963,
+    "false_matches": 1,
+    "truth_conflicts": 177,
+    "false_conflicts": 20
+   }
+  },
+  "form_value": {
+   "grad_window": {
+    "unknown_with_text_only": 76,
+    "informed_after_reading_form": 2
+   },
+   "work_auth": {
+    "unknown_with_text_only": 97,
+    "informed_after_reading_form": 86
+   }
+  },
+  "llm_median_seconds": 13.6,
+  "spread": {},
+  "runs": 1
+ },
+ "dev_after_fixes": {
+  "file": "eval-dev-20261116-001153.json",
+  "note": "after the same fixes",
+  "postings": 40,
+  "companies": 11,
+  "commit": "795195d",
+  "variants": {
+   "title_only": {
+    "grad_f1": 0.087,
+    "degree_f1": 0.37,
+    "return_f1": null,
+    "stance_stated_f1": null,
+    "card_accuracy": 0.525,
+    "false_matches": 0,
+    "truth_conflicts": 64,
+    "false_conflicts": 0
+   },
+   "rules_text_only": {
+    "grad_f1": 0.955,
+    "degree_f1": 0.955,
+    "return_f1": 1.0,
+    "stance_stated_f1": 0.857,
+    "card_accuracy": 0.996,
+    "false_matches": 0,
+    "truth_conflicts": 64,
+    "false_conflicts": 1
+   },
+   "rules": {
+    "grad_f1": 0.955,
+    "degree_f1": 0.955,
+    "return_f1": 1.0,
+    "stance_stated_f1": 0.857,
+    "card_accuracy": 0.996,
+    "false_matches": 0,
+    "truth_conflicts": 64,
+    "false_conflicts": 1
+   },
+   "llm": {
+    "grad_f1": 0.837,
+    "degree_f1": 0.977,
+    "return_f1": 0.857,
+    "stance_stated_f1": 0.8,
+    "card_accuracy": 0.963,
+    "false_matches": 3,
+    "truth_conflicts": 64,
+    "false_conflicts": 0
+   },
+   "hybrid": {
+    "grad_f1": 0.955,
+    "degree_f1": 1.0,
+    "return_f1": 1.0,
+    "stance_stated_f1": 0.778,
+    "card_accuracy": 1.0,
+    "false_matches": 0,
+    "truth_conflicts": 64,
+    "false_conflicts": 0
+   }
+  },
+  "form_value": {
+   "grad_window": {
+    "unknown_with_text_only": 18,
+    "informed_after_reading_form": 5
+   },
+   "work_auth": {
+    "unknown_with_text_only": 27,
+    "informed_after_reading_form": 18
+   }
+  },
+  "llm_median_seconds": 14.7,
+  "spread": {},
+  "runs": 1
+ },
+ "crash_runs": [
+  {
+   "file": "crash-100-kills-20261115-200451.json",
+   "commit": "507c223",
+   "kills": 100,
+   "kills_with_work_in_flight": 99,
+   "expected_changes": 2120,
+   "recorded_changes": 2120,
+   "notifications": 4240,
+   "resent_after_kill": 93,
+   "duplicate_emails": 0,
+   "note": "First run after the outbox landed."
+  },
+  {
+   "file": "crash-500-kills-20261115-223927.json",
+   "commit": "721d557",
+   "kills": 500,
+   "kills_with_work_in_flight": 214,
+   "expected_changes": 2200,
+   "recorded_changes": 2199,
+   "notifications": 4398,
+   "resent_after_kill": 159,
+   "duplicate_emails": 0,
+   "note": "Found a real bug: a change seen in the listing while a fetch was running was skipped. Fixed in 31e9031."
+  },
+  {
+   "file": "crash-500-kills-20261115-230536.json",
+   "commit": "31e9031",
+   "kills": 500,
+   "kills_with_work_in_flight": 453,
+   "expected_changes": 5860,
+   "recorded_changes": 5840,
+   "notifications": 11680,
+   "resent_after_kill": 424,
+   "duplicate_emails": 0,
+   "note": "Short of the expected count after a 3 minute wait, so lost and late work could not be told apart. Diagnostics added."
+  },
+  {
+   "file": "crash-500-kills-20261115-233352.json",
+   "commit": "3693e92",
+   "kills": 500,
+   "kills_with_work_in_flight": 450,
+   "expected_changes": 5860,
+   "recorded_changes": 5840,
+   "notifications": 11680,
+   "resent_after_kill": 415,
+   "duplicate_emails": 0,
+   "note": "Nothing lost. The harness wrote years past 2099, which the date rules do not read, so the expected count was wrong."
+  }
+ ],
+ "change_detection": {
+  "command": "./mvnw test -Peval -Dtest=ChangeEvalTest",
+  "commit": "721d557",
+  "uncommitted_changes": false,
+  "postings": 108,
+  "detector": "rules + RuleDiff, as in the worker",
+  "cases": {
+   "wording_new_sentence": {
+    "cases": 108,
+    "correct": 108,
+    "rate": 1.0
+   },
+   "wording_benefit_line": {
+    "cases": 108,
+    "correct": 108,
+    "rate": 1.0
+   },
+   "wording_pay_change": {
+    "cases": 108,
+    "correct": 108,
+    "rate": 1.0
+   },
+   "sponsorship_withdrawn": {
+    "cases": 101,
+    "correct": 101,
+    "rate": 1.0
+   },
+   "graduation_year_moved": {
+    "cases": 31,
+    "correct": 25,
+    "rate": 0.806
+   }
+  },
+  "examples_wrong": [
+   "graduation_year_moved greenhouse:affirm:8039471003",
+   "graduation_year_moved greenhouse:duolingo:8881612002",
+   "graduation_year_moved greenhouse:pinterest:7838591",
+   "graduation_year_moved greenhouse:pinterest:8140217",
+   "graduation_year_moved greenhouse:pinterest:8214788",
+   "graduation_year_moved greenhouse:samsara:8358786"
+  ],
+  "file": "change-detection-20261115-223932.json"
+ },
+ "throughput": null
+}
