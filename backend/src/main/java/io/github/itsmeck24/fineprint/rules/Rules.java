@@ -19,7 +19,8 @@ public final class Rules {
     }
 
     static final Pattern GRAD = Pattern.compile(
-            "(?i)\\b(graduat\\w*|conferr\\w*|conferral|grad (year|date)|class of|complete (your|their|a|the) degree)\\b");
+            "(?i)\\b(graduat\\w*|conferr\\w*|conferral|grad (year|date)|class of|complete (your|their|a|the) degree)\\b"
+                    + "|\\bcomplet\\w* .{0,60}\\b(degree|program)\\b|\\bobtain(ed)?\\b|\\bexpect(ed)? to (by|graduate|complete)");
     static final Pattern NOT_A_RULE = Pattern.compile(
             "(?i)\\bredact|\\bdate of birth|\\bomit\\b|compensation|salary|pay range|base pay|hourly rate");
     static final Pattern TITLE_GRAD = Pattern.compile("(?i)\\bgrad(uate|uates|uation|s)?\\b");
@@ -37,7 +38,10 @@ public final class Rules {
             "(?i)\\breturn(ing)? to (school|university|campus|your (studies|program|degree))"
                     + "|\\bcontinu(e|ing) (your )?(education|studies)"
                     + "|\\benrolled\\b.{0,80}\\b(throughout|during|after|following) the internship"
-                    + "|\\bat least one (semester|quarter|term) (remaining|left)");
+                    + "|\\bat least one (semester|quarter|term) (remaining|left)"
+                    + "|\\breturn(ing)? to (the|a|your) (degree[- ])?program"
+                    + "|\\b(semester|quarter|term) remaining in (university|school|your) studies after"
+                    + "|\\bacademic term remaining");
     static final Pattern FORM_RETURN = Pattern.compile("(?i)return to (the|your) (program|school|university|studies)");
 
     static final Pattern EEO = Pattern.compile(
@@ -50,11 +54,17 @@ public final class Rules {
             "(?i)\\bmay not\\b.{0,100}\\b(sponsor\\w*|visa|h-?1b)|\\bsponsor\\w*.{0,60}\\b(not guaranteed|case[- ]by[- ]case|may be (available|possible)|depend)");
     static final Pattern NO_SPONSOR = Pattern.compile(
             "(?i)\\b(not|unable to|cannot|can't|won't|will not|do not|does not|don't|no)\\b.{0,40}\\bsponsor"
+                    + "|\\bsponsorship\\b.{0,30}\\b(is|are) not (available|offered|provided)"
                     + "|without (the need for |requiring |needing )?(current or future )?(visa |employer |immigration )?sponsorship"
                     + "|must not (now or in the future )?require (visa |immigration )?sponsorship");
     static final Pattern YES_SPONSOR = Pattern.compile(
             "(?i)\\b(we|will|do|can|able to|happy to)\\b.{0,30}\\bsponsor|\\bsponsorship (is |will be )?(available|provided|offered)"
                     + "|\\bvisa sponsorship\\b.{0,20}\\b(available|provided)");
+    static final Pattern EXPORT_LICENSE = Pattern.compile("(?i)export licen[cs]e");
+    // "pursuing a master's" names the level you are at. "bachelor's degree required" names a minimum.
+    static final Pattern CURRENT_LEVEL = Pattern.compile(
+            "(?i)pursuing|enrolled|working towards|currently|candidate|in the process of|graduat|obtain|progressing towards|student");
+    static final Pattern OR_HIGHER = Pattern.compile("(?i)or higher|or above|or advanced");
     static final Pattern EXPORT = Pattern.compile("(?i)export control|export administration regulations|\\bITAR\\b|\\bEAR\\b");
     static final Pattern FORM_SPONSOR = Pattern.compile("(?i)sponsor");
     static final Pattern FORM_AUTH = Pattern.compile("(?i)authori[sz]ed to work|authori[sz]ation|permission to work|right to work|citizen");
@@ -97,6 +107,10 @@ public final class Rules {
                 out.add(new Criterion(Criterion.DEGREE, "text", s, null, "excluded=master,phd"));
             } else {
                 Set<String> levels = levels(s);
+                // one required level, not the level you are studying for: anyone holding it or more fits
+                if (levels.size() == 1 && (!CURRENT_LEVEL.matcher(s).find() || OR_HIGHER.matcher(s).find())) {
+                    levels = atLeast(levels.iterator().next());
+                }
                 if (!levels.isEmpty()) {
                     out.add(new Criterion(Criterion.DEGREE, "text", s, null, "allowed=" + String.join(",", levels)));
                 }
@@ -119,6 +133,10 @@ public final class Rules {
         if (CLEARANCE.matcher(s).find()) {
             return Optional.of("clearance_required");
         }
+        // "without sponsorship for an export license" is about export control, not visas
+        if (EXPORT_LICENSE.matcher(s).find()) {
+            return Optional.of("export_control");
+        }
         if (HEDGED.matcher(s).find()) {
             return Optional.of("hedged");
         }
@@ -132,6 +150,11 @@ public final class Rules {
             return Optional.of("export_control");
         }
         return Optional.empty();
+    }
+
+    static Set<String> atLeast(String level) {
+        List<String> order = List.of("bachelor", "master", "phd");
+        return new LinkedHashSet<>(order.subList(order.indexOf(level), order.size()));
     }
 
     static Set<String> levels(String s) {

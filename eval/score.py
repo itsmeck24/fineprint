@@ -219,6 +219,8 @@ def git(*args):
 
 def main():
     split = sys.argv[1] if len(sys.argv) > 1 else "dev"
+    # optional note saved with the result, for runs that are not a first look at held-out data
+    note = sys.argv[2] if len(sys.argv) > 2 else None
     labels = [json.loads(l) for l in open(ROOT / "labels" / f"{split}.jsonl") if l.strip()]
     files = sorted((ROOT / "data" / "predictions").glob(f"{split}-*.jsonl"))
     runs = {}
@@ -244,7 +246,8 @@ def main():
             if len(accs) > 1:
                 spread[f"{v}.work_auth_stance_accuracy"] = {"mean": round(statistics.mean(accs), 3), "sd": round(statistics.stdev(accs), 3), "runs": len(accs)}
     result = {
-        "command": f"python3 eval/score.py {split}",
+        "command": f"python3 eval/score.py {split}" + (f' "{note}"' if note else ""),
+        "note": note,
         "predictions": [f.name for f in files],
         "split": split,
         "postings": len(labels),

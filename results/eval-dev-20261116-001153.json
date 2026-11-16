@@ -1,0 +1,548 @@
+{
+  "command": "python3 eval/score.py dev \"after the same fixes\"",
+  "note": "after the same fixes",
+  "predictions": [
+    "dev-t0.0-s1.jsonl"
+  ],
+  "split": "dev",
+  "postings": 40,
+  "boards": [
+    "greenhouse:cloudflare",
+    "greenhouse:coinbase",
+    "greenhouse:databricks",
+    "greenhouse:doordashusa",
+    "greenhouse:figma",
+    "greenhouse:lyft",
+    "greenhouse:roblox",
+    "greenhouse:stripe",
+    "greenhouse:verkada",
+    "lever:palantir",
+    "lever:zoox"
+  ],
+  "profile": "graduation 2027-05, scored as bachelor, master and phd",
+  "commit": "795195d",
+  "labels_last_changed_in": "02d0cc5",
+  "scored_utc": "2026-11-16T00:11:53+00:00",
+  "runs": {
+    "dev-t0.0-s1": {
+      "variants": {
+        "title_only": {
+          "grad_window_found": {
+            "precision": 1.0,
+            "recall": 0.045,
+            "f1": 0.087,
+            "tp": 1,
+            "fp": 0,
+            "fn": 21
+          },
+          "grad_window_exact": {
+            "precision": 1.0,
+            "recall": 0.045,
+            "f1": 0.087,
+            "tp": 1,
+            "fp": 0,
+            "fn": 21
+          },
+          "grad_window_quote_is_labeled_sentence": 1.0,
+          "degree_found": {
+            "precision": 1.0,
+            "recall": 0.227,
+            "f1": 0.37,
+            "tp": 5,
+            "fp": 0,
+            "fn": 17
+          },
+          "degree_exact": {
+            "precision": 1.0,
+            "recall": 0.227,
+            "f1": 0.37,
+            "tp": 5,
+            "fp": 0,
+            "fn": 17
+          },
+          "degree_quote_is_labeled_sentence": 0.0,
+          "return_to_school": {
+            "precision": null,
+            "recall": 0.0,
+            "f1": null,
+            "tp": 0,
+            "fp": 0,
+            "fn": 4
+          },
+          "work_auth_stance_accuracy": 0.625,
+          "work_auth_stated": {
+            "precision": null,
+            "recall": 0.0,
+            "f1": null,
+            "tp": 0,
+            "fp": 0,
+            "fn": 15
+          },
+          "form_questions": {
+            "asks_grad": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 14
+            },
+            "asks_sponsorship": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 21
+            },
+            "asks_authorization": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 22
+            },
+            "asks_return": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 2
+            }
+          },
+          "card_may2027": {
+            "false_match": 0,
+            "false_conflict": 0,
+            "missed_conflict": 54,
+            "correct": 126,
+            "total": 240,
+            "truth_conflicts": 64,
+            "truth_matches": 68,
+            "false_match_rate_on_conflicts": 0.0,
+            "accuracy": 0.525
+          },
+          "no_rule_stays_unknown": 1.0,
+          "postings_with_disagreement_flag": 0
+        },
+        "rules_text_only": {
+          "grad_window_found": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 22,
+            "fp": 0,
+            "fn": 0
+          },
+          "grad_window_exact": {
+            "precision": 0.955,
+            "recall": 0.955,
+            "f1": 0.955,
+            "tp": 21,
+            "fp": 1,
+            "fn": 1
+          },
+          "grad_window_quote_is_labeled_sentence": 1.0,
+          "degree_found": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 22,
+            "fp": 0,
+            "fn": 0
+          },
+          "degree_exact": {
+            "precision": 0.955,
+            "recall": 0.955,
+            "f1": 0.955,
+            "tp": 21,
+            "fp": 1,
+            "fn": 1
+          },
+          "degree_quote_is_labeled_sentence": 0.905,
+          "return_to_school": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "work_auth_stance_accuracy": 0.9,
+          "work_auth_stated": {
+            "precision": 0.923,
+            "recall": 0.8,
+            "f1": 0.857,
+            "tp": 12,
+            "fp": 1,
+            "fn": 3
+          },
+          "form_questions": {
+            "asks_grad": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 14
+            },
+            "asks_sponsorship": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 21
+            },
+            "asks_authorization": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 22
+            },
+            "asks_return": {
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "tp": 0,
+              "fp": 0,
+              "fn": 2
+            }
+          },
+          "card_may2027": {
+            "false_match": 0,
+            "false_conflict": 1,
+            "missed_conflict": 0,
+            "correct": 239,
+            "total": 240,
+            "truth_conflicts": 64,
+            "truth_matches": 68,
+            "false_match_rate_on_conflicts": 0.0,
+            "accuracy": 0.996
+          },
+          "no_rule_stays_unknown": 1.0,
+          "postings_with_disagreement_flag": 0
+        },
+        "rules": {
+          "grad_window_found": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 22,
+            "fp": 0,
+            "fn": 0
+          },
+          "grad_window_exact": {
+            "precision": 0.955,
+            "recall": 0.955,
+            "f1": 0.955,
+            "tp": 21,
+            "fp": 1,
+            "fn": 1
+          },
+          "grad_window_quote_is_labeled_sentence": 1.0,
+          "degree_found": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 22,
+            "fp": 0,
+            "fn": 0
+          },
+          "degree_exact": {
+            "precision": 0.955,
+            "recall": 0.955,
+            "f1": 0.955,
+            "tp": 21,
+            "fp": 1,
+            "fn": 1
+          },
+          "degree_quote_is_labeled_sentence": 0.905,
+          "return_to_school": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "work_auth_stance_accuracy": 0.9,
+          "work_auth_stated": {
+            "precision": 0.923,
+            "recall": 0.8,
+            "f1": 0.857,
+            "tp": 12,
+            "fp": 1,
+            "fn": 3
+          },
+          "form_questions": {
+            "asks_grad": {
+              "precision": 1.0,
+              "recall": 0.857,
+              "f1": 0.923,
+              "tp": 12,
+              "fp": 0,
+              "fn": 2
+            },
+            "asks_sponsorship": {
+              "precision": 1.0,
+              "recall": 0.905,
+              "f1": 0.95,
+              "tp": 19,
+              "fp": 0,
+              "fn": 2
+            },
+            "asks_authorization": {
+              "precision": 1.0,
+              "recall": 0.682,
+              "f1": 0.811,
+              "tp": 15,
+              "fp": 0,
+              "fn": 7
+            },
+            "asks_return": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 2,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "card_may2027": {
+            "false_match": 0,
+            "false_conflict": 1,
+            "missed_conflict": 0,
+            "correct": 239,
+            "total": 240,
+            "truth_conflicts": 64,
+            "truth_matches": 68,
+            "false_match_rate_on_conflicts": 0.0,
+            "accuracy": 0.996
+          },
+          "no_rule_stays_unknown": 1.0,
+          "postings_with_disagreement_flag": 2
+        },
+        "llm": {
+          "grad_window_found": {
+            "precision": 1.0,
+            "recall": 0.955,
+            "f1": 0.977,
+            "tp": 21,
+            "fp": 0,
+            "fn": 1
+          },
+          "grad_window_exact": {
+            "precision": 0.857,
+            "recall": 0.818,
+            "f1": 0.837,
+            "tp": 18,
+            "fp": 3,
+            "fn": 4
+          },
+          "grad_window_quote_is_labeled_sentence": 1.0,
+          "degree_found": {
+            "precision": 1.0,
+            "recall": 0.955,
+            "f1": 0.977,
+            "tp": 21,
+            "fp": 0,
+            "fn": 1
+          },
+          "degree_exact": {
+            "precision": 1.0,
+            "recall": 0.955,
+            "f1": 0.977,
+            "tp": 21,
+            "fp": 0,
+            "fn": 1
+          },
+          "degree_quote_is_labeled_sentence": 0.952,
+          "return_to_school": {
+            "precision": 1.0,
+            "recall": 0.75,
+            "f1": 0.857,
+            "tp": 3,
+            "fp": 0,
+            "fn": 1
+          },
+          "work_auth_stance_accuracy": 0.85,
+          "work_auth_stated": {
+            "precision": 0.7,
+            "recall": 0.933,
+            "f1": 0.8,
+            "tp": 14,
+            "fp": 6,
+            "fn": 1
+          },
+          "form_questions": {
+            "asks_grad": {
+              "precision": 1.0,
+              "recall": 0.857,
+              "f1": 0.923,
+              "tp": 12,
+              "fp": 0,
+              "fn": 2
+            },
+            "asks_sponsorship": {
+              "precision": 1.0,
+              "recall": 0.905,
+              "f1": 0.95,
+              "tp": 19,
+              "fp": 0,
+              "fn": 2
+            },
+            "asks_authorization": {
+              "precision": 1.0,
+              "recall": 0.682,
+              "f1": 0.811,
+              "tp": 15,
+              "fp": 0,
+              "fn": 7
+            },
+            "asks_return": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 2,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "card_may2027": {
+            "false_match": 3,
+            "false_conflict": 0,
+            "missed_conflict": 4,
+            "correct": 231,
+            "total": 240,
+            "truth_conflicts": 64,
+            "truth_matches": 68,
+            "false_match_rate_on_conflicts": 0.047,
+            "accuracy": 0.963
+          },
+          "no_rule_stays_unknown": 1.0,
+          "postings_with_disagreement_flag": 2
+        },
+        "hybrid": {
+          "grad_window_found": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 22,
+            "fp": 0,
+            "fn": 0
+          },
+          "grad_window_exact": {
+            "precision": 0.955,
+            "recall": 0.955,
+            "f1": 0.955,
+            "tp": 21,
+            "fp": 1,
+            "fn": 1
+          },
+          "grad_window_quote_is_labeled_sentence": 1.0,
+          "degree_found": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 22,
+            "fp": 0,
+            "fn": 0
+          },
+          "degree_exact": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 22,
+            "fp": 0,
+            "fn": 0
+          },
+          "degree_quote_is_labeled_sentence": 1.0,
+          "return_to_school": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "work_auth_stance_accuracy": 0.825,
+          "work_auth_stated": {
+            "precision": 0.667,
+            "recall": 0.933,
+            "f1": 0.778,
+            "tp": 14,
+            "fp": 7,
+            "fn": 1
+          },
+          "form_questions": {
+            "asks_grad": {
+              "precision": 1.0,
+              "recall": 0.857,
+              "f1": 0.923,
+              "tp": 12,
+              "fp": 0,
+              "fn": 2
+            },
+            "asks_sponsorship": {
+              "precision": 1.0,
+              "recall": 0.905,
+              "f1": 0.95,
+              "tp": 19,
+              "fp": 0,
+              "fn": 2
+            },
+            "asks_authorization": {
+              "precision": 1.0,
+              "recall": 0.682,
+              "f1": 0.811,
+              "tp": 15,
+              "fp": 0,
+              "fn": 7
+            },
+            "asks_return": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 2,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "card_may2027": {
+            "false_match": 0,
+            "false_conflict": 0,
+            "missed_conflict": 0,
+            "correct": 240,
+            "total": 240,
+            "truth_conflicts": 64,
+            "truth_matches": 68,
+            "false_match_rate_on_conflicts": 0.0,
+            "accuracy": 1.0
+          },
+          "no_rule_stays_unknown": 1.0,
+          "postings_with_disagreement_flag": 2
+        }
+      },
+      "form_value": {
+        "grad_window": {
+          "unknown_with_text_only": 18,
+          "informed_after_reading_form": 5
+        },
+        "work_auth": {
+          "unknown_with_text_only": 27,
+          "informed_after_reading_form": 18
+        }
+      },
+      "llm_latency_seconds": {
+        "median": 14.7,
+        "p90": 17.1
+      },
+      "llm_quotes_rejected_not_in_posting_or_not_supporting_field": 30
+    }
+  },
+  "spread_over_runs": {}
+}

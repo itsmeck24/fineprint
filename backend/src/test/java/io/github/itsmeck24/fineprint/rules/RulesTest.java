@@ -73,6 +73,40 @@ class RulesTest {
     }
 
     @Test
+    void negatedSponsorshipIsNotASponsorship() {
+        assertThat(Rules.authStance("Please note that visa sponsorship is not available for this position.")).contains("no_sponsorship");
+        assertThat(Rules.authStance("This position is not eligible for immigration sponsorship.")).contains("no_sponsorship");
+        assertThat(Rules.authStance("Offers may depend on your authorization to receive controlled technology without "
+                + "sponsorship for an export license.")).contains("export_control");
+    }
+
+    @Test
+    void oneRequiredLevelIsAMinimum() {
+        assertThat(of(Rules.extract("Engineer", "This role requires a Bachelor's degree in a related field.", null, json),
+                Criterion.DEGREE)).extracting(Criterion::value).containsExactly("allowed=bachelor,master,phd");
+        assertThat(of(Rules.extract("Engineer", "Currently pursuing a Bachelor's degree or higher.", null, json),
+                Criterion.DEGREE)).extracting(Criterion::value).containsExactly("allowed=bachelor,master,phd");
+        assertThat(of(Rules.extract("Intern", "Currently pursuing a Master's degree in statistics.", null, json),
+                Criterion.DEGREE)).extracting(Criterion::value).containsExactly("allowed=master");
+        assertThat(of(Rules.extract("Engineer", "A graduation date in 2027 with a Bachelor's degree in a relevant field", null, json),
+                Criterion.DEGREE)).extracting(Criterion::value).containsExactly("allowed=bachelor");
+        assertThat(of(Rules.extract("Engineer", "BS/MS in Computer Science or a similar field", null, json),
+                Criterion.DEGREE)).extracting(Criterion::value).containsExactly("allowed=bachelor,master");
+    }
+
+    @Test
+    void moreWaysOfSayingGraduationAndReturn() {
+        assertThat(of(Rules.extract("Analyst", "You will complete your degree program by August 2027 or earlier.", null, json),
+                Criterion.GRAD)).hasSize(1);
+        assertThat(of(Rules.extract("Engineer", "A PhD in a related field (or expect to by August 2027)", null, json),
+                Criterion.GRAD)).hasSize(1);
+        assertThat(of(Rules.extract("Intern", "Enrolled in an MS program, returning to the program after the internship", null, json),
+                Criterion.RETURN)).hasSize(1);
+        assertThat(of(Rules.extract("Intern", "Have a minimum of one semester remaining in university studies after the internship.", null, json),
+                Criterion.RETURN)).hasSize(1);
+    }
+
+    @Test
     void equalOpportunityTextIsIgnored() {
         assertThat(Rules.authStance("We hire without regard to race, citizenship, or immigration status.")).isEmpty();
     }
