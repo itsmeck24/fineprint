@@ -59,7 +59,8 @@ host.id = "fineprint-root";
 document.body.appendChild(host);
 const shadow = host.attachShadow({ mode: "open" });
 const style = document.createElement("style");
-style.textContent = css + `
+// :root matches nothing inside a shadow tree, so the theme variables are moved onto the shadow host
+style.textContent = css.replaceAll(":root", ":host") + `
   .fp-panel { position: fixed; right: 16px; bottom: 16px; width: 360px; max-height: 70vh; overflow: auto; z-index: 2147483647;
     background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.18);
     font-family: system-ui, sans-serif; color: var(--text); font-size: 14px; }

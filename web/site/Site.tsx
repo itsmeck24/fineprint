@@ -149,7 +149,7 @@ export function Site() {
               <li key={p.url}>
                 <button className={i === pick ? "on" : ""} onClick={() => setPick(i)}>
                   <span className="co">{String(i + 1).padStart(2, "0")} &middot; {companyName(p.company)}</span>
-                  <span className="ti">{p.title}</span>
+                  <span className="ti"><span>{p.title}</span></span>
                 </button>
               </li>
             ))}

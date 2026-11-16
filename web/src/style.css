@@ -9,6 +9,10 @@
   --rule: #dcdad2;
   --highlight: #f6e27a;
   --highlight-soft: #fbf1bd;
+  /* the marker band drawn behind quoted text. on paper it is a solid stroke over the letters;
+     on a dark page a solid band hides the letters, so there it becomes a see-through wash over the whole line */
+  --marker: linear-gradient(transparent 30%, var(--highlight) 30%, var(--highlight) 92%, transparent 92%);
+  --marker-soft: linear-gradient(transparent 30%, var(--highlight-soft) 30%, var(--highlight-soft) 94%, transparent 94%);
   --redpen: #b3261e;
   --redpen-soft: #f7e1de;
   --go: #2d6a4f;
@@ -46,6 +50,8 @@
     --rule: #2f333c;
     --highlight: #c9ad3a;
     --highlight-soft: #3b3420;
+    --marker: linear-gradient(transparent 8%, rgba(214, 186, 70, 0.32) 8%, rgba(214, 186, 70, 0.32) 96%, transparent 96%);
+    --marker-soft: linear-gradient(transparent 10%, rgba(214, 186, 70, 0.18) 10%, rgba(214, 186, 70, 0.18) 94%, transparent 94%);
     --redpen: #f08a80;
     --redpen-soft: #3d2222;
     --go: #8fd0ad;
@@ -105,7 +111,7 @@ form.row input { flex: 1; min-width: 0; }
 .rule .src { display: block; font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--pencil); margin-bottom: 2px; }
 /* inline so the marker band follows every line of a long quote */
 .rule q { display: inline; font-family: var(--serif); font-size: 1.02rem; line-height: 1.55; quotes: none;
-  background: linear-gradient(transparent 62%, var(--highlight-soft) 62%);
+  background: var(--marker-soft);
   -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .rule .note { display: block; margin-top: 4px; font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
 
